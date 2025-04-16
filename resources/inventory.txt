@@ -1,0 +1,6 @@
+Clothing, P001, Jeans, 51, 120.5
+Toy, P002, ball, 5, 7.5
+Toy, P003, Chess, 72, 34.66
+Toy, P004, Console, 11, 89.99
+Clothing, P005, Jacket, 2, 89.0
+Clothing, P006, Dress, 23, 56.99

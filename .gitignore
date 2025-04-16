@@ -1,0 +1,22 @@
+# NetBeans specific
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# Maven specific
+target/
+*.log
+
+# Java
+*.class
+
+# OS & editor trash
+.DS_Store
+Thumbs.db
+
+# IDEs
+.idea/
+*.iml
