@@ -67,12 +67,14 @@ public class FileManager {
                     inventoryManager.addProduct(product);
                 }
 
+                // Extract numeric portion of product ID (e.g., "P012" → 12) to track max ID for counter
                 int numericId = Integer.parseInt(id.substring(1));
                 if (numericId > currentMax) {
                     currentMax = numericId;
                 }
             }
 
+            // Ensure future auto-generated product IDs do not overlap with existing ones
             Product.setCounter(currentMax + 1);
             br.close();
         } catch (FileNotFoundException ex) {

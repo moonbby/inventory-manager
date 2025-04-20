@@ -28,6 +28,7 @@ public abstract class Product {
         setPrice(price);
     }
     
+    // Auto-generates a product ID (e.g., P001) based on static counter
     public Product(String name, int quantity, double price) {
         this.id = String.format("P%03d", counter++);
         setName(name);
@@ -37,6 +38,7 @@ public abstract class Product {
 
     public abstract String getProductType();
 
+    // Allows external class (e.g., FileManager) to set the static ID counter manually
     public static void setCounter(int value) {
         counter = value;
     }

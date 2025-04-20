@@ -17,16 +17,20 @@ import models.Product;
 
 public class InventoryManager {
 
+    // In-memory storage of all products using unique product ID as key
     private HashMap<String, Product> products = new HashMap<>();
 
+    // Adds a new product to the inventory
     public void addProduct(Product product) {
         products.put(product.getID(), product);
     }
 
+    // Removes a product by ID
     public void removeProduct(String id) {
         products.remove(id);
     }
 
+    // Decreases quantity of a product, ensuring it doesn't go below zero
     public void reduceQuantity(String id, int quantity) {
         if (products.containsKey(id)) {
             Product p = products.get(id);
@@ -34,6 +38,7 @@ public class InventoryManager {
         }
     }
 
+    // Increases quantity of a product
     public void addQuantity(String id, int quantity) {
         if (products.containsKey(id)) {
             Product p = products.get(id);
@@ -41,10 +46,12 @@ public class InventoryManager {
         }
     }
 
+    // Returns product object by ID
     public Product getProduct(String id) {
         return products.get(id);
     }
 
+    // Returns all products in inventory
     public Collection<Product> getAllProducts() {
         return products.values();
     }

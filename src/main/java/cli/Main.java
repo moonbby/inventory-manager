@@ -30,7 +30,6 @@ public class Main {
     }
 
     public void run() {
-
         while (true) {
             printMenu();
             handleUserInput();
@@ -54,27 +53,20 @@ public class Main {
             scan.nextLine();
 
             switch (input) {
-                case 1:
+                case 1 ->
                     addProductMenu();
-                    break;
-                case 2:
+                case 2 ->
                     removeProductMenu();
-                    break;
-                case 3:
+                case 3 ->
                     restockProductMenu();
-                    break;
-                case 4:
+                case 4 ->
                     purchaseProductMenu();
-                    break;
-                case 5:
+                case 5 ->
                     viewProductsMenu();
-                    break;
-                case 6:
+                case 6 ->
                     saveExitMenu();
-                    break;
-                default:
-                    System.out.println("Wrong input! Try again.");
-                    break;
+                default ->
+                    System.out.println("Wrong input! Input must be between 1 to 6. Try again.");
             }
         } catch (InputMismatchException e) {
             System.out.println("Invalid input! Please enter a number.");
@@ -96,41 +88,23 @@ public class Main {
             }
         }
 
-        System.out.println("Enter product name: ");
-        String name = scan.nextLine();
-
-        int quantity = -1;
-        while (quantity < 0) {
-            try {
-                System.out.println("Enter quantity: ");
-                quantity = scan.nextInt();
-                scan.nextLine();
-                if (quantity < 0) {
-                    System.out.println("Quantity must be non-negative.");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter a number.");
-                scan.nextLine();
+        // Prompt until a valid non-empty product name is entered
+        String name;
+        while (true) {
+            System.out.println("Enter product name:");
+            name = scan.nextLine();
+            if (!name.trim().isEmpty()) {
+                break;
             }
+            System.out.println("Product name cannot be empty.");
         }
 
-        double price = -1;
-        while (price < 0) {
-            try {
-                System.out.println("Enter price: ");
-                price = scan.nextDouble();
-                scan.nextLine();
-                if (price < 0) {
-                    System.out.println("Price must be non-negative!");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter a number.");
-                scan.nextLine();
-            }
-        }
+        int quantity = promptInt("Enter quantity: ", 0);
+        double price = promptDouble("Enter price: ", 0);
 
         Product product = null;
 
+        // Determine product type based on user input
         if (type.equalsIgnoreCase("Clothing")) {
             product = new ClothingProduct(name, quantity, price);
         } else if (type.equalsIgnoreCase("Toy")) {
@@ -142,89 +116,27 @@ public class Main {
     }
 
     public void removeProductMenu() {
-        System.out.println("Enter the ID of the product to remove (e.g., P001): ");
-        String id = scan.nextLine();
-
-        while (true) {
-            if (inventoryManager.hasProduct(id)) {
-                inventoryManager.removeProduct(id);
-                System.out.println("Product removed successfully.");
-                break;
-            } else {
-                System.out.println("The product with that ID does not exist! Try again: ");
-                id = scan.nextLine();
-            }
-        }
+        String id = promptValidProductID("Enter the ID of the product to remove (e.g., P001):");
+        inventoryManager.removeProduct(id);
+        System.out.println("Product removed successfully.");
     }
 
     public void restockProductMenu() {
-        System.out.println("Enter the ID of the product to restock (e.g., P001): ");
-        String id = scan.nextLine();
-
-        while (true) {
-            if (!inventoryManager.hasProduct(id)) {
-                System.out.println("The product with that ID does not exist! Try again: ");
-                id = scan.nextLine();
-            } else {
-                break;
-            }
-        }
-
-        int quantity = -1;
-        while (quantity < 1) {
-            try {
-                System.out.println("Enter the quantity of the product to restock: ");
-                quantity = scan.nextInt();
-                scan.nextLine();
-
-                if (quantity < 1) {
-                    System.out.println("Quantity must be at least 1!");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter a number.");
-                scan.nextLine();
-            }
-        }
-
+        String id = promptValidProductID("Enter the ID of the product to restock (e.g., P001):");
+        int quantity = promptInt("Enter the quantity of the product to restock: ", 1);
         inventoryManager.addQuantity(id, quantity);
         System.out.println("Product restocked successfully.");
     }
 
     public void purchaseProductMenu() {
-        System.out.println("Enter the ID of the product to purchase (e.g., P001): ");
-        String id = scan.nextLine();
-
-        while (true) {
-            if (!inventoryManager.hasProduct(id)) {
-                System.out.println("The product with that ID does not exist! Try again: ");
-                id = scan.nextLine();
-            } else {
-                break;
-            }
-        }
-
-        int quantity = -1;
-        while (quantity < 1) {
-            try {
-                System.out.println("Enter the quantity of the product to purchase: ");
-                quantity = scan.nextInt();
-                scan.nextLine();
-
-                if (quantity < 1) {
-                    System.out.println("Quantity must be at least 1!");
-                }
-            } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter a number.");
-                scan.nextLine();
-            }
-        }
-
+        String id = promptValidProductID("Enter the ID of the product to purchase (e.g., P001):");
         Product product = inventoryManager.getProduct(id);
+        int quantity;
+
         while (true) {
+            quantity = promptInt("Enter the quantity of the product to purchase: ", 1);
             if (product.getQuantity() < quantity) {
                 System.out.println("Not enough stock available! Try again:");
-                quantity = scan.nextInt();
-                scan.nextLine();
             } else {
                 break;
             }
@@ -251,5 +163,58 @@ public class Main {
         fileManager.writeProducts(inventoryManager.getProductMap());
         System.out.println("File is saved successfully!");
         System.exit(0);
+    }
+
+    // =========================
+    //       HELPER METHODS
+    // =========================
+    
+    // Prompts for a product ID and ensures it exists in inventory
+    public String promptValidProductID(String message) {
+        System.out.println(message);
+        String id = scan.nextLine();
+        while (!inventoryManager.hasProduct(id)) {
+            System.out.println("The product with that ID does not exist! Try again:");
+            id = scan.nextLine();
+        }
+        return id;
+    }
+
+    // Prompts for a numeric input with minimum value validation and error handling
+    public int promptInt(String message, int minValue) {
+        int value = -1;
+        while (value < minValue) {
+            try {
+                System.out.println(message);
+                value = scan.nextInt();
+                scan.nextLine();
+                if (value < minValue) {
+                    System.out.println("Input must be at least " + minValue);
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input! Please enter a number.");
+                scan.nextLine();
+            }
+        }
+        return value;
+    }
+
+    // Prompts for a numeric input with minimum value validation and error handling
+    public double promptDouble(String message, double minValue) {
+        double value = -1;
+        while (value < minValue) {
+            try {
+                System.out.println(message);
+                value = scan.nextDouble();
+                scan.nextLine();
+                if (value < minValue) {
+                    System.out.println("Input must be at least " + minValue);
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input! Please enter a number.");
+                scan.nextLine();
+            }
+        }
+        return value;
     }
 }
