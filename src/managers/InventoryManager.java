@@ -6,7 +6,6 @@ package managers;
 
 import interfaces.IInventoryManager;
 import java.util.Collection;
-import java.util.HashMap;
 import models.Product;
 
 /**
@@ -18,59 +17,55 @@ import models.Product;
 public class InventoryManager implements IInventoryManager {
 
     // Stores all products in memory, keyed by unique product ID.
-    private final HashMap<String, Product> products = new HashMap<>();
+    private final ProductDAO productDAO = new ProductDAO();
 
     // Adds a product to the inventory by its unique ID.
     @Override
     public void addProduct(Product product) {
-        products.put(product.getID(), product);
+        productDAO.addProduct(product);
     }
 
     // Removes a product from the inventory by its ID.
     @Override
     public void removeProduct(String id) {
-        products.remove(id);
+        productDAO.removeProduct(id);
     }
 
     // Reduces the quantity of the specified product, preventing negative stock.
     @Override
     public void reduceQuantity(String id, int quantity) {
-        if (products.containsKey(id)) {
-            Product p = products.get(id);
-            p.setQuantity(Math.max(p.getQuantity() - quantity, 0));
+        Product product = getProduct(id);
+        if (product != null) {
+            int newQuantity = Math.max(product.getQuantity() - quantity, 0);
+            productDAO.updateQuantity(id, newQuantity);
         }
     }
 
     // Increases the quantity of the specified product.
     @Override
     public void addQuantity(String id, int quantity) {
-        if (products.containsKey(id)) {
-            Product p = products.get(id);
-            p.setQuantity(p.getQuantity() + quantity);
+        Product product = getProduct(id);
+        if (product != null) {
+            int newQuantity = product.getQuantity() + quantity;
+            productDAO.updateQuantity(id, newQuantity);
         }
     }
 
     // Retrieves a product by its ID.
     @Override
     public Product getProduct(String id) {
-        return products.get(id);
+        return productDAO.getProduct(id);
     }
 
     // Returns a collection of all products in the inventory.
     @Override
     public Collection<Product> getAllProducts() {
-        return products.values();
-    }
-
-    // Returns the full internal map of product IDs to Product objects.
-    @Override
-    public HashMap<String, Product> getProductMap() {
-        return products;
+        return productDAO.getAllProducts();
     }
 
     // Checks whether a product with the given ID exists in the inventory.
     @Override
     public boolean hasProduct(String id) {
-        return products.containsKey(id);
+        return productDAO.getProduct(id) != null;
     }
 }

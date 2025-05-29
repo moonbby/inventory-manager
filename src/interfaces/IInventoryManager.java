@@ -62,13 +62,6 @@ public interface IInventoryManager {
     Collection<Product> getAllProducts();
 
     /**
-     * Gets the full map of product IDs to products.
-     * 
-     * @return the internal product map
-     */
-    HashMap<String, Product> getProductMap();
-
-    /**
      * Checks if a product exists by its ID.
      * 
      * @param id the product ID

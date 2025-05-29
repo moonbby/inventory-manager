@@ -59,22 +59,17 @@ public class ProductDAO {
         }
     }
 
-    public void updateProduct(Product product) {
+    public void updateQuantity(String id, int newQuantity) {
         try {
-            String sql = "UPDATE Products\n"
-                    + "SET NAME = ?, QUANTITY = ?, PRICE = ?, TYPE = ?\n"
-                    + "WHERE ID = ?";
+            String sql = "UPDATE PRODUCTS SET QUANTITY = ? WHERE ID = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1, product.getName());
-            ps.setInt(2, product.getQuantity());
-            ps.setDouble(3, product.getPrice());
-            ps.setString(4, product.getProductType());
-            ps.setString(5, product.getID());
+            ps.setInt(1, newQuantity);
+            ps.setString(2, id);
             ps.executeUpdate();
             ps.close();
         } catch (SQLException ex) {
-            System.err.println("SQLException during updating product: " + ex.getMessage());
+            System.err.println("SQLException during updating quantity: " + ex.getMessage());
         }
     }
 
@@ -142,7 +137,7 @@ public class ProductDAO {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, threshold);
             ResultSet rs = ps.executeQuery();
-                        
+
             while (rs.next()) {
                 String id = rs.getString(1);
                 String name = rs.getString(2);
