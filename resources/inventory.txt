@@ -1,0 +1,9 @@
+Clothing, P005, Jacket, 5, 89.0
+Toy, P004, Console, 11, 89.99
+Clothing, P007, T-Shirt, 36, 50.99
+Clothing, P006, Dress, 23, 56.99
+Clothing, P001, Jeans, 51, 120.5
+Toy, P003, Chess, 72, 34.66
+Clothing, P002, Pajamas, 7, 78.89
+Toy, P009, Slime, 99, 13.5
+Toy, P008, Teddy Bear, 100, 21.99
