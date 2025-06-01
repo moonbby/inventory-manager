@@ -27,7 +27,7 @@ public class MainMenuController {
     private final ProductMenuController productMenuController;
     private final DeveloperToolsMenuController devToolsMenuController;
     private final ReportManager reportManager = new ReportManager();
-    private final BackupManager backupManager = new BackupManager();
+    private final BackupManager backupManager;
 
     public MainMenuController(IInventoryManager inventoryManager, IInputHelper inputHelper,
             LogManager logManager, UtilityMenuController utilityMenuController,
@@ -38,6 +38,7 @@ public class MainMenuController {
         this.utilityMenuController = utilityMenuController;
         this.productMenuController = productMenuController;
         this.devToolsMenuController = devToolsMenuController;
+        this.backupManager = new BackupManager(logManager);
     }
 
     /**
@@ -89,7 +90,7 @@ public class MainMenuController {
                 case 0 ->
                     saveExitMenu();
                 default ->
-                    System.out.println("Invalid input! Please enter a number from 1 to 8. Try again.");
+                    System.out.println("Invalid input! Please enter a number from 0 to 8. Try again.");
             }
         } catch (InputMismatchException e) {
             System.out.println("Invalid input! Please enter a number.");
@@ -107,10 +108,10 @@ public class MainMenuController {
             System.out.println("2. View backup file");
             System.out.println("3. Create inventory backup");
             System.out.println("4. Export low stock");
-            System.out.println("5. Back to main menu");
+            System.out.println("0. Back to main menu");
 
             String input = inputHelper.promptString("");
-            if (input == null || input.equals("5")) {
+            if (input == null || input.equals("0")) {
                 return;
             }
 
@@ -124,7 +125,7 @@ public class MainMenuController {
                 case "4" ->
                     utilityMenuController.exportLowStockMenu();
                 default ->
-                    System.out.println("Invalid input! Please enter a number from 1 to 5. Try again.");
+                    System.out.println("Invalid input! Please enter a number from 0 to 4. Try again.");
             }
         }
     }
@@ -137,10 +138,10 @@ public class MainMenuController {
             System.out.println("\n=== Reports Menu ===");
             System.out.println("1. View summary report");
             System.out.println("2. View most expensive product");
-            System.out.println("3. Back to main menu");
+            System.out.println("0. Back to main menu");
 
             String input = inputHelper.promptString("");
-            if (input == null || input.equals("3")) {
+            if (input == null || input.equals("0")) {
                 return;
             }
 
@@ -150,7 +151,7 @@ public class MainMenuController {
                 case "2" ->
                     reportManager.showMostExpensiveProduct();
                 default ->
-                    System.out.println("Invalid input! Please enter a number from 1 to 3. Try again.");
+                    System.out.println("Invalid input! Please enter a number from 0 to 2. Try again.");
             }
         }
     }
@@ -161,10 +162,10 @@ public class MainMenuController {
             System.out.println("1. Reset products table");
             System.out.println("2. Reset logs table");
             System.out.println("3. Reset backup table");
-            System.out.println("4. Back to main menu");
+            System.out.println("0. Back to main menu");
 
             String input = inputHelper.promptString("");
-            if (input == null || input.equals("4")) {
+            if (input == null || input.equals("0")) {
                 return;
             }
 
@@ -176,7 +177,7 @@ public class MainMenuController {
                 case "3" ->
                     devToolsMenuController.performBackupTableReset();
                 default ->
-                    System.out.println("Invalid input! Please enter a number from 1 to 4. Try again.");
+                    System.out.println("Invalid input! Please enter a number from 0 to 3. Try again.");
             }
         }
     }
@@ -197,7 +198,7 @@ public class MainMenuController {
             } else if (confirm.equalsIgnoreCase("yes")) {
                 backupManager.backupInventory();
                 System.out.println("Inventory backup created successfully. Goodbye!");
-                logManager.log("User chose to save and exit.");
+                logManager.logRaw("User chose to save and exit.");
                 System.exit(0);
             } else {
                 System.out.println("Invalid input! Input must be either yes or no. Try again.");

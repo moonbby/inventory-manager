@@ -11,10 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import models.ClothingProduct;
 import models.Product;
-import models.ToyProduct;
-import static utils.LoggerUtil.logStatus;
 import utils.ProductFactory;
 
 /**
@@ -27,6 +24,11 @@ import utils.ProductFactory;
 public class BackupManager {
 
     private final Connection conn = DatabaseManager.getInstance().getConnection();
+    private final LogManager logManager;
+    
+    public BackupManager(LogManager logManager) {
+        this.logManager = logManager;
+    }
 
     /**
      * Creates a backup of the current inventory by copying the contents of the
@@ -40,7 +42,7 @@ public class BackupManager {
             List<Product> products = productDAO.getAllProducts();
 
             if (products.isEmpty()) {
-                System.out.println("No products to back up.");
+                logManager.logRaw("No products found to back up.");
                 return;
             }
 
@@ -62,9 +64,9 @@ public class BackupManager {
             ps.executeBatch();
             ps.close();
 
-            logStatus("Backed up", "inventory to " + TABLE_BACKUP + " table", true, null);
+            logManager.log("Backed up", "inventory to " + TABLE_BACKUP + " table", true, null);
         } catch (SQLException ex) {
-            logStatus("Backup", "inventory", false, ex.getMessage());
+            logManager.log("Backup", "inventory", false, ex.getMessage());
         }
     }
 
@@ -91,9 +93,9 @@ public class BackupManager {
             ps.close();
             rs.close();
             
-            logStatus("Fetched", "backup products", true, null);
+            logManager.log("Fetched", "backup products", true, null);
         } catch (SQLException ex) {
-            logStatus("Fetch", "backup products", false, ex.getMessage());
+            logManager.log("Fetch", "backup products", false, ex.getMessage());
         }
         
         return products;

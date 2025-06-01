@@ -7,7 +7,6 @@ package managers;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import static utils.LoggerUtil.logStatus;
 
 /**
  *
@@ -34,47 +33,40 @@ public class DatabaseManager {
 
     public Connection getConnection() {
         if (conn == null) {
-            logStatus("Reconnect", "database", false, "Connection is null. Attempting to re-establish...");
             establishConnection();
         }
         return conn;
     }
 
-    public void establishConnection() {
+    public boolean establishConnection() {
         if (conn != null) {
-            return;
+            return true;
         }
 
         int attempts = 0;
         while (attempts < MAX_RETRIES) {
             try {
                 conn = DriverManager.getConnection(URL);
-                logStatus("Connected", URL, true, null);
-                break;
+                return true;
             } catch (SQLException ex) {
                 attempts++;
-                logStatus("Retry", "connection attempt " + attempts, false, ex.getMessage());
-                if (attempts == MAX_RETRIES) {
-                    logStatus("Connect", "database", false, "Could not establish DB connection after " + MAX_RETRIES + " attempts.");
-                }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    logStatus("Retry", "connection", false, "Interrupted during wait.");
                     break;
                 }
             }
         }
+        return false;
     }
 
     public void closeConnections() {
         if (conn != null) {
             try {
                 conn.close();
-                logStatus("Closed", "database connection", true, null);
             } catch (SQLException ex) {
-                logStatus("Close", "database connection", false, ex.getMessage());
+                
             }
         }
     }

@@ -10,7 +10,6 @@ import managers.DatabaseManager;
 import managers.InventoryManager;
 import managers.LogManager;
 import managers.InventoryTableSeeder;
-import java.sql.Connection;
 import utils.InputHelper;
 
 /**
@@ -31,6 +30,7 @@ public class InventorySystem {
     private static final DeveloperToolsMenuController devToolsMenuController = new DeveloperToolsMenuController();
     private static final MainMenuController mainMenuController = new MainMenuController(inventoryManager, inputHelper, logManager,
             utilityMenuController, productMenuController, devToolsMenuController);
+
     /**
      * Initialises core system components and launches the application.
      *
@@ -41,16 +41,15 @@ public class InventorySystem {
      * @param args command-line arguments (unused)
      */
     public static void main(String[] args) {
-        DatabaseManager.getInstance().getConnection();
-        new InventoryTableSeeder().initialiseAllTables();
-        logManager.resetLogs();
-        
-        InventorySystem app = new InventorySystem();
+        initialiseSystem();
+
         System.out.println("\nWelcome to the inventory management system!");
         System.out.println("How can I help you? Type a number.");
         System.out.println("INFO: You can type 'exit' anytime during input to cancel and return to the previous menu.");
         System.out.println("INFO: To quit, choose 'Save and Exit' from the main menu.");
-        app.run();
+
+        InventorySystem app = new InventorySystem();
+        app.startApp();
     }
 
     /**
@@ -59,10 +58,25 @@ public class InventorySystem {
      * Continuously runs the main menu loop, accepting user input until the
      * programme is explicitly terminated via the 'Save and Exit' option.
      */
-    public void run() {
+    public static void startApp() {
         while (true) {
             mainMenuController.printMenu();
             mainMenuController.handleUserInput();
         }
+    }
+
+    private static void initialiseSystem() {
+        boolean connected = DatabaseManager.getInstance().establishConnection();
+        if (!connected) {
+            logManager.log("Connect", "database", false, "Failed to connect to database after 3 attempts.");
+            System.err.println("Critical error: could not connect to DB.");
+            System.exit(1);
+        }
+
+        logManager.resetLogs();
+        logManager.log("Connected", "to database successfully.", true, null);
+        
+        new InventoryTableSeeder().initialiseAllTables();
+        
     }
 }

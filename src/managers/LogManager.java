@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import static utils.LoggerUtil.logStatus;
 
 /**
  * Handles logging of user activity and system events for audit and
@@ -27,16 +26,40 @@ public class LogManager {
     Connection conn = DatabaseManager.getInstance().getConnection();
 
     // Adds a new log entry with a timestamp to the log file.
-    public void log(String message) {
+    public void log(String action, String target, boolean success, String errorMessage) {
+        try {
+            StringBuilder message = new StringBuilder();
+
+            if (success) {
+                message.append("Successfully ").append(action.toLowerCase()).append(" ").append(target);
+            } else {
+                message.append("Failed to ").append(action.toLowerCase()).append(" ").append(target);
+                if (errorMessage != null && !errorMessage.isBlank()) {
+                    message.append(": ").append(errorMessage);
+                }
+            }
+
+            String sql = "INSERT INTO " + TABLE_LOGS + " (ACTION) VALUES (?)";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, message.toString());
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException ex) {
+            // Avoid recursive loop - log() inside log() causes infinite loop on failure
+            System.err.println("Failed to insert log: " + ex.getMessage());;
+        }
+    }
+
+    public void logRaw(String message) {
         try {
             String sql = "INSERT INTO " + TABLE_LOGS + " (ACTION) VALUES (?)";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, message);
             ps.executeUpdate();
             ps.close();
-            logStatus("Inserted", "log entry", true, null);
         } catch (SQLException ex) {
-            logStatus("Insert", "log entry", false, ex.getMessage());
+            // Avoid recursive loop - log() inside log() causes infinite loop on failure
+            System.err.println("Failed to insert log: " + ex.getMessage());;
         }
     }
 
@@ -58,11 +81,12 @@ public class LogManager {
             }
             ps.close();
             rs.close();
-            logStatus("Fetched", "all log entries", true, null);
+
+            log("Fetched", "all log entries", true, null);
         } catch (SQLException ex) {
-            logStatus("Fetch", "logs", false, ex.getMessage());
+            log("Fetch", "logs", false, ex.getMessage());
         }
-        
+
         return logs;
     }
 
@@ -71,9 +95,9 @@ public class LogManager {
             Statement statement = conn.createStatement();
             statement.executeUpdate("DELETE FROM " + TABLE_LOGS);
             statement.close();
-            logStatus("Cleared", "logs", true, null);
+            log("Cleared", "logs", true, null);
         } catch (SQLException ex) {
-            logStatus("Clear", "logs", false, ex.getMessage());
+            log("Clear", "logs", false, ex.getMessage());
         }
     }
 

@@ -23,13 +23,14 @@ public class UtilityMenuController {
     private final IInventoryManager inventoryManager;
     private final IInputHelper inputHelper;
     private final LogManager logManager;
-    private final BackupManager backupManager = new BackupManager();
+    private final BackupManager backupManager;
 
     public UtilityMenuController(IInventoryManager inventoryManager,
             IInputHelper inputHelper, LogManager logManager) {
         this.inventoryManager = inventoryManager;
         this.inputHelper = inputHelper;
         this.logManager = logManager;
+        this.backupManager = new BackupManager(logManager);
     }
 
     /**
@@ -39,7 +40,6 @@ public class UtilityMenuController {
      */
     public void showLogsMenu() {
         List<String> logs = logManager.getLogs();
-        logManager.log("Viewed activity log.");
 
         if (logs == null || logs.isEmpty()) {
             System.out.println("No logs found.");

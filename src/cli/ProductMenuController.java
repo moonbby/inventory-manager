@@ -11,6 +11,7 @@ import java.util.List;
 import managers.LogManager;
 import models.Product;
 import utils.CLIPrinter;
+import utils.ProductTypes;
 
 /**
  * Handles all product-related menu operations.
@@ -47,7 +48,7 @@ public class ProductMenuController {
                 return;
             }
 
-            if (!(type.equalsIgnoreCase("Clothing")) && !(type.equalsIgnoreCase("Toy"))) {
+            if (!(type.equalsIgnoreCase(ProductTypes.CLOTHING)) && !(type.equalsIgnoreCase(ProductTypes.TOY))) {
                 System.out.println("Error! Invalid product type! Try again.");
             } else {
                 break;
@@ -74,7 +75,7 @@ public class ProductMenuController {
             return;
         }
 
-        double price = inputHelper.promptDouble("Enter price: ", 0);
+        double price = inputHelper.promptDouble("Enter price: ", 0.01);
         if (price == -1) {
             System.out.println("Cancelled.");
             return;
@@ -88,9 +89,6 @@ public class ProductMenuController {
         }
         
         System.out.println("Product added successfully");
-        logManager.log("Added " + product.getProductType() + " " + product.getID()
-                + ": " + product.getName() + " (Qty: " + product.getQuantity()
-                + ", $" + product.getPrice() + ")");
     }
 
     /**
@@ -105,11 +103,8 @@ public class ProductMenuController {
             return;
         }
 
-        Product removed = inventoryManager.getProduct(id);
         inventoryManager.removeProduct(id);
         System.out.println("Product removed successfully.");
-        logManager.log("Removed " + removed.getProductType()
-                + " " + removed.getID() + ": " + removed.getName());
     }
 
     /**
@@ -137,10 +132,6 @@ public class ProductMenuController {
         inventoryManager.addQuantity(id, quantity);
         product = inventoryManager.getProduct(id);
         System.out.println("Product restocked successfully. Updated stock: " + product.getQuantity());
-
-        logManager.log("Restocked " + quantity + " of "
-                + product.getProductType() + " " + product.getID()
-                + ": " + product.getName());
     }
 
     /**
@@ -173,10 +164,6 @@ public class ProductMenuController {
 
         inventoryManager.reduceQuantity(id, quantity);
         System.out.println("Product purchased successfully.");
-
-        logManager.log("Purchased " + quantity + " of "
-                + product.getProductType() + " " + product.getID()
-                + ": " + product.getName());
     }
 
     /**
@@ -187,7 +174,6 @@ public class ProductMenuController {
      */
     public void showProductsMenu() {
         List<Product> products = inventoryManager.getAllProducts();
-        logManager.log("Viewed all products.");
 
         if (products.isEmpty()) {
             System.out.println("No products in inventory.");

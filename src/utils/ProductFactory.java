@@ -10,14 +10,14 @@ import models.ClothingProduct;
 import models.Product;
 import models.ToyProduct;
 import static utils.DBConstants.*;
-import static utils.LoggerUtil.logStatus;
+import static utils.ProductTypes.*;
 
 /**
  *
  * @author lifeo
  */
 public class ProductFactory {
-    
+
     public static Product createFromResultSet(ResultSet rs) throws SQLException {
         String id = rs.getString(COL_PRODUCT_ID);
         String name = rs.getString(COL_NAME);
@@ -25,14 +25,14 @@ public class ProductFactory {
         double price = rs.getDouble(COL_PRICE);
         String type = rs.getString(COL_TYPE);
 
-        if (type.equalsIgnoreCase("Clothing")) {
+        if (type.equalsIgnoreCase(CLOTHING)) {
             return new ClothingProduct(id, name, quantity, price);
-        } else if (type.equalsIgnoreCase("Toy")) {
+        } else if (type.equalsIgnoreCase(TOY)) {
             return new ToyProduct(id, name, quantity, price);
         } else {
-            logStatus("Map", "product type '" + type + "'", false, "Unrecognised type.");
+            System.err.println("Unrecognised product type: '" + type + "' during result set mapping.");
             return null;
         }
     }
-    
+
 }

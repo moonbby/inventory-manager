@@ -4,6 +4,8 @@
  */
 package models;
 
+import static utils.ProductTypes.CLOTHING;
+
 /**
  * Represents a clothing product within the inventory.
  *
@@ -21,6 +23,6 @@ public class ClothingProduct extends Product {
     // Returns the type of this product.
     @Override
     public String getProductType() {
-        return "Clothing";
+        return CLOTHING;
     }
 }

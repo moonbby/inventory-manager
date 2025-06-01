@@ -47,9 +47,9 @@ public class ReportManager {
             rs.close();
             ps.close();
 
-            logManager.log("Viewed summary report.");
+            logManager.log("Viewed", "summary report", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during viewing summary report: " + ex.getMessage());
+            logManager.log("View", "summary report", false, ex.getMessage());
         }
     }
 
@@ -75,7 +75,7 @@ public class ReportManager {
                 System.out.println("Price: $" + rs.getDouble(COL_PRICE));
                 System.out.println("Quantity: " + rs.getInt(COL_QUANTITY));
 
-                logManager.log("Viewed most expensive product.");
+                logManager.log("Viewed", "most expensive product", true, null);
             } else {
                 System.out.println("Inventory is empty.");
             }
@@ -83,7 +83,7 @@ public class ReportManager {
             rs.close();
             ps.close();
         } catch (SQLException ex) {
-            System.err.println("SQLException during viewing most expensive product: " + ex.getMessage());
+            logManager.log("View", "most expensive product", false, ex.getMessage());
         }
     }
 }

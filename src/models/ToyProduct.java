@@ -4,6 +4,8 @@
  */
 package models;
 
+import static utils.ProductTypes.TOY;
+
 /**
  * Represents a toy product within the inventory.
  *
@@ -21,6 +23,6 @@ public class ToyProduct extends Product {
     // Returns the type of this product.
     @Override
     public String getProductType() {
-        return "Toy";
+        return TOY;
     }
 }
