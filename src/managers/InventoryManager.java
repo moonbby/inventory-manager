@@ -6,6 +6,7 @@ package managers;
 
 import interfaces.IInventoryManager;
 import java.util.Collection;
+import java.util.List;
 import models.Product;
 
 /**
@@ -21,8 +22,8 @@ public class InventoryManager implements IInventoryManager {
 
     // Adds a product to the inventory by its unique ID.
     @Override
-    public void addProduct(Product product) {
-        productDAO.addProduct(product);
+    public Product addProduct(String type, String name, int quantity, double price) {
+        return productDAO.addProduct(type, name, quantity, price);
     }
 
     // Removes a product from the inventory by its ID.
@@ -59,7 +60,7 @@ public class InventoryManager implements IInventoryManager {
 
     // Returns a collection of all products in the inventory.
     @Override
-    public Collection<Product> getAllProducts() {
+    public List<Product> getAllProducts() {
         return productDAO.getAllProducts();
     }
 
@@ -67,5 +68,10 @@ public class InventoryManager implements IInventoryManager {
     @Override
     public boolean hasProduct(String id) {
         return productDAO.getProduct(id) != null;
+    }
+
+    @Override
+    public List<Product> getLowStockProducts(int threshold) {
+        return productDAO.getLowStockProducts(threshold);
     }
 }

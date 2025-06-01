@@ -16,22 +16,10 @@ public abstract class Product {
     private String name;
     private int quantity;
     private double price;
-    private static int counter = 1;
 
     // Constructs a product with a predefined ID, typically used during file loading.
     public Product(String id, String name, int quantity, double price) {
         this.id = id;
-        setName(name);
-        setQuantity(quantity);
-        setPrice(price);
-    }
-
-    /**
-     * Constructs a product with an auto-generated ID. Used for new entries
-     * added at run-time.
-     */
-    public Product(String name, int quantity, double price) {
-        this.id = String.format("P%03d", counter++);
         setName(name);
         setQuantity(quantity);
         setPrice(price);
@@ -43,16 +31,6 @@ public abstract class Product {
      * @return the product type (e.g., "Clothing", "Toy")
      */
     public abstract String getProductType();
-
-    /**
-     * Updates the internal product ID counter. Used when loading from file to
-     * avoid duplicate IDs.
-     *
-     * @param value the new counter starting value
-     */
-    public static void setCounter(int value) {
-        counter = value;
-    }
 
     public String getID() {
         return id;

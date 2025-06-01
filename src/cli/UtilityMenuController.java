@@ -4,12 +4,13 @@
  */
 package cli;
 
-import interfaces.IFileManager;
 import interfaces.IInputHelper;
 import interfaces.IInventoryManager;
-import java.util.ArrayList;
+import java.util.List;
 import managers.BackupManager;
 import managers.LogManager;
+import models.Product;
+import utils.CLIPrinter;
 
 /**
  * Handles auxiliary inventory management features.
@@ -20,13 +21,15 @@ import managers.LogManager;
 public class UtilityMenuController {
 
     private final IInventoryManager inventoryManager;
-    private final IFileManager fileManager;
     private final IInputHelper inputHelper;
+    private final LogManager logManager;
+    private final BackupManager backupManager = new BackupManager();
 
-    public UtilityMenuController(IInventoryManager inventoryManager, IFileManager fileManager, IInputHelper inputHelper) {
+    public UtilityMenuController(IInventoryManager inventoryManager,
+            IInputHelper inputHelper, LogManager logManager) {
         this.inventoryManager = inventoryManager;
-        this.fileManager = fileManager;
         this.inputHelper = inputHelper;
+        this.logManager = logManager;
     }
 
     /**
@@ -35,8 +38,8 @@ public class UtilityMenuController {
      * Prints all log entries to the console or a message if none exist.
      */
     public void viewLogsMenu() {
-        ArrayList<String> logs = LogManager.getLogs();
-        LogManager.log("Viewed activity log.");
+        List<String> logs = logManager.getLogs();
+        logManager.log("Viewed activity log.");
 
         if (logs == null || logs.isEmpty()) {
             System.out.println("No logs found.");
@@ -55,7 +58,7 @@ public class UtilityMenuController {
      * Prints each entry or notifies if the file is missing or empty.
      */
     public void viewBackup() {
-        ArrayList<String> backup = BackupManager.getBackup();
+        List<Product> backup = backupManager.getBackup();
 
         if (backup == null || backup.isEmpty()) {
             System.out.println("No backup found.");
@@ -63,9 +66,7 @@ public class UtilityMenuController {
         }
 
         System.out.println("\n=== Backup Copy of Inventory ===");
-        for (String entry : backup) {
-            System.out.println(entry);
-        }
+        CLIPrinter.printProducts(backup);
     }
 
     /**
@@ -74,7 +75,7 @@ public class UtilityMenuController {
      * Copies data to a backup file and confirms completion.
      */
     public void createBackup() {
-        BackupManager.backupInventory();
+        backupManager.backupInventory();
         System.out.println("Backup created successfully.");
     }
 
@@ -90,7 +91,8 @@ public class UtilityMenuController {
             System.out.println("Cancelled.");
             return;
         }
-        fileManager.exportLowStock(inventoryManager.getProductMap(), threshold);
+        List<Product> lowStockProducts = inventoryManager.getLowStockProducts(threshold);
+        CLIPrinter.printProducts(lowStockProducts);
     }
 
 }

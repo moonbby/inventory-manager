@@ -18,14 +18,6 @@ public class ClothingProduct extends Product {
         super(id, name, quantity, price);
     }
 
-    /**
-     * Constructs a ClothingProduct with an auto-generated ID. Used when adding
-     * new entries during run-time.
-     */
-    public ClothingProduct(String name, int quantity, double price) {
-        super(name, quantity, price);
-    }
-
     // Returns the type of this product.
     @Override
     public String getProductType() {

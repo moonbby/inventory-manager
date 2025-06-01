@@ -7,10 +7,10 @@ package cli;
 import interfaces.IInputHelper;
 import interfaces.IInventoryManager;
 import java.util.Collection;
+import java.util.List;
 import managers.LogManager;
-import models.ClothingProduct;
 import models.Product;
-import models.ToyProduct;
+import utils.CLIPrinter;
 
 /**
  * Handles all product-related menu operations.
@@ -22,10 +22,13 @@ public class ProductMenuController {
 
     private final IInventoryManager inventoryManager;
     private final IInputHelper inputHelper;
+    private final LogManager logManager;
 
-    public ProductMenuController(IInventoryManager inventoryManager, IInputHelper inputHelper) {
+    public ProductMenuController(IInventoryManager inventoryManager,
+            IInputHelper inputHelper, LogManager logManager) {
         this.inventoryManager = inventoryManager;
         this.inputHelper = inputHelper;
+        this.logManager = logManager;
     }
 
     /**
@@ -77,20 +80,15 @@ public class ProductMenuController {
             return;
         }
 
-        Product product = null;
+        Product product = inventoryManager.addProduct(type, name, quantity, price);
 
-        if (type.equalsIgnoreCase("Clothing")) {
-            product = new ClothingProduct(name, quantity, price);
-        } else if (type.equalsIgnoreCase("Toy")) {
-            product = new ToyProduct(name, quantity, price);
-        } else {
-            // This should never happen due to validation above
-            throw new IllegalStateException("Unexpected product type: " + type);
+        if (product == null) {
+            System.out.println("Failed to add product due to internal error.");
+            return;
         }
-
-        inventoryManager.addProduct(product);
+        
         System.out.println("Product added successfully");
-        LogManager.log("Added " + product.getProductType() + " " + product.getID()
+        logManager.log("Added " + product.getProductType() + " " + product.getID()
                 + ": " + product.getName() + " (Qty: " + product.getQuantity()
                 + ", $" + product.getPrice() + ")");
     }
@@ -110,7 +108,7 @@ public class ProductMenuController {
         Product removed = inventoryManager.getProduct(id);
         inventoryManager.removeProduct(id);
         System.out.println("Product removed successfully.");
-        LogManager.log("Removed " + removed.getProductType()
+        logManager.log("Removed " + removed.getProductType()
                 + " " + removed.getID() + ": " + removed.getName());
     }
 
@@ -137,9 +135,10 @@ public class ProductMenuController {
         }
 
         inventoryManager.addQuantity(id, quantity);
+        product = inventoryManager.getProduct(id);
         System.out.println("Product restocked successfully. Updated stock: " + product.getQuantity());
 
-        LogManager.log("Restocked " + quantity + " of "
+        logManager.log("Restocked " + quantity + " of "
                 + product.getProductType() + " " + product.getID()
                 + ": " + product.getName());
     }
@@ -175,7 +174,7 @@ public class ProductMenuController {
         inventoryManager.reduceQuantity(id, quantity);
         System.out.println("Product purchased successfully.");
 
-        LogManager.log("Purchased " + quantity + " of "
+        logManager.log("Purchased " + quantity + " of "
                 + product.getProductType() + " " + product.getID()
                 + ": " + product.getName());
     }
@@ -187,19 +186,15 @@ public class ProductMenuController {
      * inventory is empty.
      */
     public void viewProductsMenu() {
-        Collection<Product> products = inventoryManager.getAllProducts();
-        LogManager.log("Viewed all products.");
+        List<Product> products = inventoryManager.getAllProducts();
+        logManager.log("Viewed all products.");
 
         if (products.isEmpty()) {
             System.out.println("No products in inventory.");
             return;
         }
 
-        for (Product p : products) {
-            System.out.println("Type: " + p.getProductType() + " | ID: " + p.getID()
-                    + " | Name: " + p.getName() + " | Quantity: " + p.getQuantity()
-                    + " | Price: " + p.getPrice());
-        }
+        CLIPrinter.printProducts(products);
     }
 
 }

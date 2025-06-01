@@ -4,17 +4,15 @@
  */
 package managers;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDateTime;
+import static utils.DBConstants.*;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import utils.FilePaths;
+import java.util.List;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
  * Handles logging of user activity and system events for audit and
@@ -25,51 +23,54 @@ import utils.FilePaths;
  */
 public class LogManager {
 
-    // Adds a new log entry with a timestamp to the log file.
-    public static void log(String message) {
-        try {
-            PrintWriter pw = new PrintWriter(new FileOutputStream(FilePaths.LOG_FILE_PATH, true));
+    Connection conn = DatabaseManager.getInstance().getConnection();
 
-            String time = LocalDateTime.now().toString();
-            pw.println(time + " - " + message);
-            pw.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+    // Adds a new log entry with a timestamp to the log file.
+    public void log(String message) {
+        try {
+            String sql = "INSERT INTO " + TABLE_LOGS + " (ACTION) VALUES (?)";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, message);
+            ps.executeUpdate();
+            System.out.println("Log inserted into " + TABLE_LOGS + " table.");
+            ps.close();
+        } catch (SQLException ex) {
+            System.err.println("SQLException during inserting a log: " + ex.getMessage());
         }
     }
 
     // Returns all log entries from the log file as a list of strings.
-    public static ArrayList<String> getLogs() {
-        ArrayList<String> logs = new ArrayList<String>();
+    public List<String> getLogs() {
+        List<String> logs = new ArrayList<String>();
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader(FilePaths.LOG_FILE_PATH));
-            String line = null;
+            String sql = "SELECT * FROM " + TABLE_LOGS + " ORDER BY " + COL_TIMESTAMP + " ASC";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
 
-            while ((line = br.readLine()) != null) {
-                logs.add(line);
+            while (rs.next()) {
+                int id = rs.getInt(1);
+                String action = rs.getString(2);
+                Timestamp timestamp = rs.getTimestamp(3);
+
+                logs.add("ID: " + id + " | Action: " + action + " | Time: " + timestamp);
             }
-            br.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(FileManager.class.getName()).log(Level.SEVERE, null, ex);
+            ps.close();
+            rs.close();
+        } catch (SQLException ex) {
+            System.err.println("SQLException during fetching logs: " + ex.getMessage());
         }
-
         return logs;
     }
 
-    /**
-     * Clears the log file to start a fresh session.
-     *
-     * Called at application start.
-     */
-    public static void initialize() {
+    public void resetLogs() {
         try {
-            PrintWriter pw = new PrintWriter(FilePaths.LOG_FILE_PATH);
-            pw.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(LogManager.class.getName()).log(Level.SEVERE, null, ex);
+            Statement statement = conn.createStatement();
+            statement.executeUpdate("DELETE FROM " + TABLE_LOGS);
+            statement.close();
+            System.out.println("All logs cleared.");
+        } catch (SQLException ex) {
+            System.err.println("SQLException during log reset: " + ex.getMessage());
         }
     }
 

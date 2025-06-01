@@ -4,8 +4,11 @@
  */
 package managers;
 
-import java.util.Collection;
-import models.Product;
+import static utils.DBConstants.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Generates analytical reports based on current inventory data.
@@ -15,30 +18,39 @@ import models.Product;
  */
 public class ReportManager {
 
+    Connection conn = DatabaseManager.getInstance().getConnection();
+    private final LogManager logManager = new LogManager();
+
     /**
      * Prints a summary of product counts by category.
      *
      * @param products the current list of inventory items
      */
-    public static void viewSummaryReport(Collection<Product> products) {
-        int totalCount = 0;
-        int clothingCount = 0;
-        int toyCount = 0;
+    public void viewSummaryReport() {
+        try {
+            System.out.println("\n=== Inventory Summary Report ===");
 
-        for (Product p : products) {
-            totalCount++;
-            if (p.getProductType().equalsIgnoreCase("Clothing")) {
-                clothingCount++;
-            } else if (p.getProductType().equalsIgnoreCase("Toy")) {
-                toyCount++;
+            String categoryCountSQL = "SELECT " + COL_TYPE + ", COUNT(*) AS count FROM "
+                    + TABLE_PRODUCTS + " GROUP BY " + COL_TYPE;
+            PreparedStatement ps = conn.prepareStatement(categoryCountSQL);
+            ResultSet rs = ps.executeQuery();
+
+            int total = 0;
+            while (rs.next()) {
+                String type = rs.getString(COL_TYPE);
+                int count = rs.getInt("count");
+                System.out.println(type + " products: " + count);
+                total += count;
             }
-        }
+            System.out.println("Total products: " + total);
 
-        System.out.println("\n=== Inventory Summary Report ===");
-        System.out.println("Total products: " + totalCount);
-        System.out.println("Clothing products: " + clothingCount);
-        System.out.println("Toy products: " + toyCount);
-        LogManager.log("Viewed summary report.");
+            rs.close();
+            ps.close();
+
+            logManager.log("Viewed summary report.");
+        } catch (SQLException ex) {
+            System.err.println("SQLException during viewing summary report: " + ex.getMessage());
+        }
     }
 
     /**
@@ -48,25 +60,30 @@ public class ReportManager {
      *
      * @param products the current list of inventory items
      */
-    public static void viewMostExpensiveProduct(Collection<Product> products) {
-        if (products.isEmpty()) {
-            System.out.println("Inventory is empty.");
-            return;
-        }
+    public void viewMostExpensiveProduct() {
+        try {
+            String sql = "SELECT * FROM " + TABLE_PRODUCTS + " ORDER BY "
+                    + COL_PRICE + " DESC FETCH FIRST 1 ROWS ONLY";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
 
-        Product max = null;
-        for (Product p : products) {
-            if (max == null || p.getPrice() > max.getPrice()) {
-                max = p;
+            if (rs.next()) {
+                System.out.println("\n=== Most Expensive Product ===");
+                System.out.println("Type: " + rs.getString(COL_TYPE));
+                System.out.println("ID: " + rs.getString(COL_PRODUCT_ID));
+                System.out.println("Name: " + rs.getString(COL_NAME));
+                System.out.println("Price: $" + rs.getDouble(COL_PRICE));
+                System.out.println("Quantity: " + rs.getInt(COL_QUANTITY));
+
+                logManager.log("Viewed most expensive product.");
+            } else {
+                System.out.println("Inventory is empty.");
             }
-        }
 
-        System.out.println("\n=== Most Expensive Product ===");
-        System.out.println("Type: " + max.getProductType());
-        System.out.println("ID: " + max.getID());
-        System.out.println("Name: " + max.getName());
-        System.out.println("Price: $" + max.getPrice());
-        System.out.println("Quantity: " + max.getQuantity());
-        LogManager.log("Viewed most expensive product.");
+            rs.close();
+            ps.close();
+        } catch (SQLException ex) {
+            System.err.println("SQLException during viewing most expensive product: " + ex.getMessage());
+        }
     }
 }

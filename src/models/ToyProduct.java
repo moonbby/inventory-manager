@@ -18,14 +18,6 @@ public class ToyProduct extends Product {
         super(id, name, quantity, price);
     }
 
-    /**
-     * Constructs a ToyProduct with an auto-generated ID. Used when adding new
-     * entries during run-time.
-     */
-    public ToyProduct(String name, int quantity, double price) {
-        super(name, quantity, price);
-    }
-
     // Returns the type of this product.
     @Override
     public String getProductType() {

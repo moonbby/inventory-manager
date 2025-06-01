@@ -4,13 +4,13 @@
  */
 package cli;
 
-import interfaces.IFileManager;
 import interfaces.IInputHelper;
 import interfaces.IInventoryManager;
-import managers.FileManager;
+import managers.DatabaseManager;
 import managers.InventoryManager;
 import managers.LogManager;
-import utils.FilePaths;
+import managers.InventoryTableSeeder;
+import java.sql.Connection;
 import utils.InputHelper;
 
 /**
@@ -24,12 +24,12 @@ import utils.InputHelper;
 public class InventorySystem {
 
     private static final IInventoryManager inventoryManager = new InventoryManager();
-    private static final IFileManager fileManager = new FileManager(FilePaths.INVENTORY_FILE_PATH);
     private static final IInputHelper inputHelper = new InputHelper(inventoryManager);
-    private static final UtilityMenuController utilityMenuController = new UtilityMenuController(inventoryManager, fileManager, inputHelper);
-    private static final ProductMenuController productMenuController = new ProductMenuController(inventoryManager, inputHelper);
-    private static final MainMenuController mainMenuController = new MainMenuController(inventoryManager, fileManager, inputHelper, utilityMenuController, productMenuController);
-
+    private static final LogManager logManager = new LogManager();
+    private static final UtilityMenuController utilityMenuController = new UtilityMenuController(inventoryManager, inputHelper, logManager);
+    private static final ProductMenuController productMenuController = new ProductMenuController(inventoryManager, inputHelper, logManager);
+    private static final MainMenuController mainMenuController = new MainMenuController(inventoryManager, inputHelper, logManager,
+            utilityMenuController, productMenuController);
     /**
      * Initialises core system components and launches the application.
      *
@@ -40,8 +40,10 @@ public class InventorySystem {
      * @param args command-line arguments (unused)
      */
     public static void main(String[] args) {
-        LogManager.initialize();
-        fileManager.readProducts(inventoryManager);
+        DatabaseManager.getInstance().getConnection();
+        new InventoryTableSeeder().seedAllTables();
+        logManager.resetLogs();
+        
         InventorySystem app = new InventorySystem();
         System.out.println("Welcome to the inventory management system!");
         System.out.println("How can I help you? Type a number.");

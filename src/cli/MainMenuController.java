@@ -4,7 +4,6 @@
  */
 package cli;
 
-import interfaces.IFileManager;
 import interfaces.IInputHelper;
 import interfaces.IInventoryManager;
 import java.util.InputMismatchException;
@@ -22,16 +21,19 @@ public class MainMenuController {
 
     private final Scanner scan = new Scanner(System.in);
     private final IInventoryManager inventoryManager;
-    private final IFileManager fileManager;
     private final IInputHelper inputHelper;
+    private final LogManager logManager;
     private final UtilityMenuController utilityMenuController;
     private final ProductMenuController productMenuController;
+    private final ReportManager reportManager = new ReportManager();
+    private final BackupManager backupManager = new BackupManager();
 
-    public MainMenuController(IInventoryManager inventoryManager, IFileManager fileManager,
-            IInputHelper inputHelper, UtilityMenuController utilityMenuController, ProductMenuController productMenuController) {
+
+    public MainMenuController(IInventoryManager inventoryManager, IInputHelper inputHelper, LogManager logManager,
+            UtilityMenuController utilityMenuController, ProductMenuController productMenuController) {
         this.inventoryManager = inventoryManager;
-        this.fileManager = fileManager;
         this.inputHelper = inputHelper;
+        this.logManager = logManager;
         this.utilityMenuController = utilityMenuController;
         this.productMenuController = productMenuController;
     }
@@ -139,9 +141,9 @@ public class MainMenuController {
 
             switch (input) {
                 case "1" ->
-                    ReportManager.viewSummaryReport(inventoryManager.getAllProducts());
+                    reportManager.viewSummaryReport();
                 case "2" ->
-                    ReportManager.viewMostExpensiveProduct(inventoryManager.getAllProducts());
+                    reportManager.viewMostExpensiveProduct();
                 default ->
                     System.out.println("Invalid input! Please enter a number from 1 to 3. Try again.");
             }
@@ -162,10 +164,9 @@ public class MainMenuController {
                 System.out.println("Cancelled.");
                 return;
             } else if (confirm.equalsIgnoreCase("yes")) {
-                fileManager.writeProducts(inventoryManager.getProductMap());
-                BackupManager.backupInventory();
-                System.out.println("Inventory file saved and backup created successfully.");
-                LogManager.log("User chose to save and exit.");
+                backupManager.backupInventory();
+                System.out.println("Inventory backup created successfully. Goodbye!");
+                logManager.log("User chose to save and exit.");
                 System.exit(0);
             } else {
                 System.out.println("Invalid input! Input must be either yes or no. Try again.");

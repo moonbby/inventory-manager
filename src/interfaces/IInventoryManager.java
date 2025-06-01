@@ -6,6 +6,7 @@ package interfaces;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import models.Product;
 
 /**
@@ -21,7 +22,7 @@ public interface IInventoryManager {
      * 
      * @param product the product to add
      */
-    void addProduct(Product product);
+    Product addProduct(String type, String name, int quantity, double price);
 
     /**
      * Removes a product by its ID.
@@ -59,7 +60,7 @@ public interface IInventoryManager {
      * 
      * @return a collection of all products
      */
-    Collection<Product> getAllProducts();
+    List<Product> getAllProducts();
 
     /**
      * Checks if a product exists by its ID.
@@ -68,4 +69,6 @@ public interface IInventoryManager {
      * @return true if found, false otherwise
      */
     boolean hasProduct(String id);
+    
+    List<Product> getLowStockProducts(int threshold);
 }
