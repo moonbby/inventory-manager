@@ -16,6 +16,8 @@ import models.ClothingProduct;
 import models.Product;
 import models.ToyProduct;
 import static utils.DBConstants.*;
+import static utils.LoggerUtil.logStatus;
+import utils.ProductFactory;
 
 /**
  *
@@ -51,8 +53,9 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ps.executeUpdate();
             ps.close();
 
+            logStatus("Added", "product " + product.getID(), true, null);
         } catch (SQLException ex) {
-            System.err.println("Failed to add product to DB: " + ex.getMessage());
+            logStatus("Add", "product", false, ex.getMessage());
         }
         return product;
     }
@@ -66,8 +69,10 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ps.setString(1, id);
             ps.executeUpdate();
             ps.close();
+
+            logStatus("Removed", "product " + id, true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during removing product: " + ex.getMessage());
+            logStatus("Remove", "product " + id, false, ex.getMessage());
         }
     }
 
@@ -81,8 +86,10 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ps.setString(2, id);
             ps.executeUpdate();
             ps.close();
+
+            logStatus("Updated", "quantity for product " + id, true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during updating quantity: " + ex.getMessage());
+            logStatus("Update", "quantity for product " + id, false, ex.getMessage());
         }
     }
 
@@ -96,21 +103,18 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String name = rs.getString(2);
-                int quantity = rs.getInt(3);
-                double price = rs.getDouble(4);
-                String type = rs.getString(5);
-
-                if (type.equalsIgnoreCase("Clothing")) {
-                    product = new ClothingProduct(id, name, quantity, price);
-                } else if (type.equalsIgnoreCase("Toy")) {
-                    product = new ToyProduct(id, name, quantity, price);
-                }
+                product = ProductFactory.createFromResultSet(rs);
             }
             ps.close();
             rs.close();
+
+            if (product != null) {
+                logStatus("Fetched", "product " + id, true, null);
+            } else {
+                logStatus("Fetch", "product " + id, false, "Product not found.");
+            }
         } catch (SQLException ex) {
-            System.err.println("SQLException during getting product: " + ex.getMessage());
+            logStatus("Fetch", "product " + id, false, ex.getMessage());
         }
         return product;
     }
@@ -124,22 +128,15 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String id = rs.getString(1);
-                String name = rs.getString(2);
-                int quantity = rs.getInt(3);
-                double price = rs.getDouble(4);
-                String type = rs.getString(5);
-
-                if (type.equalsIgnoreCase("Clothing")) {
-                    products.add(new ClothingProduct(id, name, quantity, price));
-                } else if (type.equalsIgnoreCase("Toy")) {
-                    products.add(new ToyProduct(id, name, quantity, price));
-                }
+                Product product = ProductFactory.createFromResultSet(rs);
+                products.add(product);
             }
             ps.close();
             rs.close();
+
+            logStatus("Fetched", "all products", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during getting all products: " + ex.getMessage());
+            logStatus("Fetch", "all products", false, ex.getMessage());
         }
         return products;
     }
@@ -154,22 +151,15 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String id = rs.getString(1);
-                String name = rs.getString(2);
-                int quantity = rs.getInt(3);
-                double price = rs.getDouble(4);
-                String type = rs.getString(5);
-
-                if (type.equalsIgnoreCase("Clothing")) {
-                    products.add(new ClothingProduct(id, name, quantity, price));
-                } else if (type.equalsIgnoreCase("Toy")) {
-                    products.add(new ToyProduct(id, name, quantity, price));
-                }
+                Product product = ProductFactory.createFromResultSet(rs);
+                products.add(product);
             }
             ps.close();
             rs.close();
+
+            logStatus("Fetched", "low stock products (threshold: " + threshold + ")", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during getting low stock products: " + ex.getMessage());
+            logStatus("Fetch", "low stock products", false, ex.getMessage());
         }
         return products;
     }
@@ -191,9 +181,8 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ps.close();
             return String.format("P%03d", maxID + 1);
         } catch (SQLException ex) {
-            System.err.println("Error generating product ID: " + ex.getMessage());
-            return "P999"; // fallback
+            logStatus("Generate", "new product ID", false, ex.getMessage());
+            return "P_ERR"; // fallback
         }
     }
-
 }

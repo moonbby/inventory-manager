@@ -28,8 +28,9 @@ public class InventorySystem {
     private static final LogManager logManager = new LogManager();
     private static final UtilityMenuController utilityMenuController = new UtilityMenuController(inventoryManager, inputHelper, logManager);
     private static final ProductMenuController productMenuController = new ProductMenuController(inventoryManager, inputHelper, logManager);
+    private static final DeveloperToolsMenuController devToolsMenuController = new DeveloperToolsMenuController();
     private static final MainMenuController mainMenuController = new MainMenuController(inventoryManager, inputHelper, logManager,
-            utilityMenuController, productMenuController);
+            utilityMenuController, productMenuController, devToolsMenuController);
     /**
      * Initialises core system components and launches the application.
      *
@@ -41,11 +42,11 @@ public class InventorySystem {
      */
     public static void main(String[] args) {
         DatabaseManager.getInstance().getConnection();
-        new InventoryTableSeeder().seedAllTables();
+        new InventoryTableSeeder().initialiseAllTables();
         logManager.resetLogs();
         
         InventorySystem app = new InventorySystem();
-        System.out.println("Welcome to the inventory management system!");
+        System.out.println("\nWelcome to the inventory management system!");
         System.out.println("How can I help you? Type a number.");
         System.out.println("INFO: You can type 'exit' anytime during input to cancel and return to the previous menu.");
         System.out.println("INFO: To quit, choose 'Save and Exit' from the main menu.");

@@ -14,6 +14,8 @@ import java.util.List;
 import models.ClothingProduct;
 import models.Product;
 import models.ToyProduct;
+import static utils.LoggerUtil.logStatus;
+import utils.ProductFactory;
 
 /**
  * Handles inventory backup operations to support data recovery.
@@ -60,9 +62,9 @@ public class BackupManager {
             ps.executeBatch();
             ps.close();
 
-            System.out.println("Inventory successfully backed up to " + TABLE_BACKUP + " table.");
+            logStatus("Backed up", "inventory to " + TABLE_BACKUP + " table", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during backup: " + ex.getMessage());
+            logStatus("Backup", "inventory", false, ex.getMessage());
         }
     }
 
@@ -82,22 +84,16 @@ public class BackupManager {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String id = rs.getString(1);
-                String name = rs.getString(2);
-                int quantity = rs.getInt(3);
-                double price = rs.getDouble(4);
-                String type = rs.getString(5);
-
-                if (type.equalsIgnoreCase("Clothing")) {
-                    products.add(new ClothingProduct(id, name, quantity, price));
-                } else if (type.equalsIgnoreCase("Toy")) {
-                    products.add(new ToyProduct(id, name, quantity, price));
-                }
+                Product product = ProductFactory.createFromResultSet(rs);
+                products.add(product);
             }
+            
             ps.close();
             rs.close();
+            
+            logStatus("Fetched", "backup products", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during getting backup: " + ex.getMessage());
+            logStatus("Fetch", "backup products", false, ex.getMessage());
         }
         
         return products;

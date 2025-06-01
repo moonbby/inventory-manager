@@ -37,7 +37,7 @@ public class UtilityMenuController {
      *
      * Prints all log entries to the console or a message if none exist.
      */
-    public void viewLogsMenu() {
+    public void showLogsMenu() {
         List<String> logs = logManager.getLogs();
         logManager.log("Viewed activity log.");
 
@@ -57,7 +57,7 @@ public class UtilityMenuController {
      *
      * Prints each entry or notifies if the file is missing or empty.
      */
-    public void viewBackup() {
+    public void showBackup() {
         List<Product> backup = backupManager.getBackup();
 
         if (backup == null || backup.isEmpty()) {

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import static utils.LoggerUtil.logStatus;
 
 /**
  * Handles logging of user activity and system events for audit and
@@ -32,10 +33,10 @@ public class LogManager {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, message);
             ps.executeUpdate();
-            System.out.println("Log inserted into " + TABLE_LOGS + " table.");
             ps.close();
+            logStatus("Inserted", "log entry", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during inserting a log: " + ex.getMessage());
+            logStatus("Insert", "log entry", false, ex.getMessage());
         }
     }
 
@@ -57,9 +58,11 @@ public class LogManager {
             }
             ps.close();
             rs.close();
+            logStatus("Fetched", "all log entries", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during fetching logs: " + ex.getMessage());
+            logStatus("Fetch", "logs", false, ex.getMessage());
         }
+        
         return logs;
     }
 
@@ -68,9 +71,9 @@ public class LogManager {
             Statement statement = conn.createStatement();
             statement.executeUpdate("DELETE FROM " + TABLE_LOGS);
             statement.close();
-            System.out.println("All logs cleared.");
+            logStatus("Cleared", "logs", true, null);
         } catch (SQLException ex) {
-            System.err.println("SQLException during log reset: " + ex.getMessage());
+            logStatus("Clear", "logs", false, ex.getMessage());
         }
     }
 

@@ -7,6 +7,7 @@ package managers;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import static utils.LoggerUtil.logStatus;
 
 /**
  *
@@ -30,10 +31,10 @@ public class DatabaseManager {
     public static DatabaseManager getInstance() {
         return instance;
     }
-    
+
     public Connection getConnection() {
         if (conn == null) {
-            System.err.println("Connection is null. Attempting to re-establish...");
+            logStatus("Reconnect", "database", false, "Connection is null. Attempting to re-establish...");
             establishConnection();
         }
         return conn;
@@ -48,18 +49,19 @@ public class DatabaseManager {
         while (attempts < MAX_RETRIES) {
             try {
                 conn = DriverManager.getConnection(URL);
-                System.out.println(URL + " connected successfully.");
+                logStatus("Connected", URL, true, null);
                 break;
             } catch (SQLException ex) {
                 attempts++;
-                System.err.println("Connection attempt " + attempts + " failed: " + ex.getMessage());
+                logStatus("Retry", "connection attempt " + attempts, false, ex.getMessage());
                 if (attempts == MAX_RETRIES) {
-                    System.err.println("Could not establish DB connection after " + MAX_RETRIES + " attempts.");
+                    logStatus("Connect", "database", false, "Could not establish DB connection after " + MAX_RETRIES + " attempts.");
                 }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
+                    logStatus("Retry", "connection", false, "Interrupted during wait.");
                     break;
                 }
             }
@@ -70,8 +72,9 @@ public class DatabaseManager {
         if (conn != null) {
             try {
                 conn.close();
+                logStatus("Closed", "database connection", true, null);
             } catch (SQLException ex) {
-                System.err.println("SQLException during closing connection: " + ex.getMessage());
+                logStatus("Close", "database connection", false, ex.getMessage());
             }
         }
     }

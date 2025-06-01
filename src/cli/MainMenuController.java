@@ -25,17 +25,19 @@ public class MainMenuController {
     private final LogManager logManager;
     private final UtilityMenuController utilityMenuController;
     private final ProductMenuController productMenuController;
+    private final DeveloperToolsMenuController devToolsMenuController;
     private final ReportManager reportManager = new ReportManager();
     private final BackupManager backupManager = new BackupManager();
 
-
-    public MainMenuController(IInventoryManager inventoryManager, IInputHelper inputHelper, LogManager logManager,
-            UtilityMenuController utilityMenuController, ProductMenuController productMenuController) {
+    public MainMenuController(IInventoryManager inventoryManager, IInputHelper inputHelper,
+            LogManager logManager, UtilityMenuController utilityMenuController,
+            ProductMenuController productMenuController, DeveloperToolsMenuController devToolsMenuController) {
         this.inventoryManager = inventoryManager;
         this.inputHelper = inputHelper;
         this.logManager = logManager;
         this.utilityMenuController = utilityMenuController;
         this.productMenuController = productMenuController;
+        this.devToolsMenuController = devToolsMenuController;
     }
 
     /**
@@ -52,7 +54,8 @@ public class MainMenuController {
         System.out.println("Option 5: View all products");
         System.out.println("Option 6: Utilities");
         System.out.println("Option 7: View reports");
-        System.out.println("Option 8: Save and Exit\n");
+        System.out.println("Option 8: Developer Tools");
+        System.out.println("Option 0: Save and Exit\n");
     }
 
     /**
@@ -76,12 +79,14 @@ public class MainMenuController {
                 case 4 ->
                     productMenuController.purchaseProductMenu();
                 case 5 ->
-                    productMenuController.viewProductsMenu();
+                    productMenuController.showProductsMenu();
                 case 6 ->
-                    viewUtilitiesMenu();
+                    showUtilitiesMenu();
                 case 7 ->
-                    viewReportMenu();
+                    showReportsMenu();
                 case 8 ->
+                    showDeveloperToolsMenu();
+                case 0 ->
                     saveExitMenu();
                 default ->
                     System.out.println("Invalid input! Please enter a number from 1 to 8. Try again.");
@@ -95,7 +100,7 @@ public class MainMenuController {
     /**
      * Displays and handles the Utilities Menu options.
      */
-    public void viewUtilitiesMenu() {
+    public void showUtilitiesMenu() {
         while (true) {
             System.out.println("\n=== Utilities Menu ===");
             System.out.println("1. View activity log");
@@ -111,9 +116,9 @@ public class MainMenuController {
 
             switch (input) {
                 case "1" ->
-                    utilityMenuController.viewLogsMenu();
+                    utilityMenuController.showLogsMenu();
                 case "2" ->
-                    utilityMenuController.viewBackup();
+                    utilityMenuController.showBackup();
                 case "3" ->
                     utilityMenuController.createBackup();
                 case "4" ->
@@ -127,9 +132,9 @@ public class MainMenuController {
     /**
      * Displays and handles the Report Menu options.
      */
-    public void viewReportMenu() {
+    public void showReportsMenu() {
         while (true) {
-            System.out.println("\n=== Report Menu ===");
+            System.out.println("\n=== Reports Menu ===");
             System.out.println("1. View summary report");
             System.out.println("2. View most expensive product");
             System.out.println("3. Back to main menu");
@@ -141,11 +146,37 @@ public class MainMenuController {
 
             switch (input) {
                 case "1" ->
-                    reportManager.viewSummaryReport();
+                    reportManager.showSummaryReport();
                 case "2" ->
-                    reportManager.viewMostExpensiveProduct();
+                    reportManager.showMostExpensiveProduct();
                 default ->
                     System.out.println("Invalid input! Please enter a number from 1 to 3. Try again.");
+            }
+        }
+    }
+
+    public void showDeveloperToolsMenu() {
+        while (true) {
+            System.out.println("\n=== Developer Tools ===");
+            System.out.println("1. Reset products table");
+            System.out.println("2. Reset logs table");
+            System.out.println("3. Reset backup table");
+            System.out.println("4. Back to main menu");
+
+            String input = inputHelper.promptString("");
+            if (input == null || input.equals("4")) {
+                return;
+            }
+
+            switch (input) {
+                case "1" ->
+                    devToolsMenuController.performProductTableReset();
+                case "2" ->
+                    devToolsMenuController.performLogsTableReset();
+                case "3" ->
+                    devToolsMenuController.performBackupTableReset();
+                default ->
+                    System.out.println("Invalid input! Please enter a number from 1 to 4. Try again.");
             }
         }
     }

@@ -185,7 +185,7 @@ public class ProductMenuController {
      * Shows product type, ID, name, quantity, and price. Displays a message if
      * inventory is empty.
      */
-    public void viewProductsMenu() {
+    public void showProductsMenu() {
         List<Product> products = inventoryManager.getAllProducts();
         logManager.log("Viewed all products.");
 

@@ -26,7 +26,7 @@ public class ReportManager {
      *
      * @param products the current list of inventory items
      */
-    public void viewSummaryReport() {
+    public void showSummaryReport() {
         try {
             System.out.println("\n=== Inventory Summary Report ===");
 
@@ -60,7 +60,7 @@ public class ReportManager {
      *
      * @param products the current list of inventory items
      */
-    public void viewMostExpensiveProduct() {
+    public void showMostExpensiveProduct() {
         try {
             String sql = "SELECT * FROM " + TABLE_PRODUCTS + " ORDER BY "
                     + COL_PRICE + " DESC FETCH FIRST 1 ROWS ONLY";

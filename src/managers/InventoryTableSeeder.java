@@ -10,6 +10,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import static utils.LoggerUtil.logStatus;
 
 /**
  *
@@ -20,32 +21,32 @@ public class InventoryTableSeeder {
     private final Connection conn = DatabaseManager.getInstance().getConnection();
     private Statement statement;
 
-    public void seedAllTables() {
+    public void initialiseAllTables() {
         try {
             conn.setAutoCommit(false);
-            createProductsTableWithSeedData();
+            createAndSeedProductsTable();
             createBackupProductsTable();
             createLogsTable();
             conn.commit();
-            System.out.println("All tables created and seeded successfully.");
+            logStatus("Initialised", "all", true, null);
         } catch (SQLException ex) {
+            logStatus("Initialise", "all", false, ex.getMessage());
             try {
                 conn.rollback();
-                System.err.println("Seeding failed. Rolled back changes.");
+                logStatus("Rollback", "changes", true, null);
             } catch (SQLException rollbackEx) {
-                System.err.println("Rollback failed: " + rollbackEx.getMessage());
+                logStatus("Rollback", "changes", false, rollbackEx.getMessage());
             }
-            System.err.println("SQLException during seeding: " + ex.getMessage());
         } finally {
             try {
                 conn.setAutoCommit(true);
             } catch (SQLException e) {
-                System.err.println("Failed to reset auto-commit: " + e.getMessage());
+                logStatus("Reset", "auto-commit", false, e.getMessage());
             }
         }
     }
-    
-    public void createProductsTableWithSeedData() {
+
+    public void createAndSeedProductsTable() {
         try {
             if (!tableExists(TABLE_PRODUCTS)) {
                 this.statement = conn.createStatement();
@@ -65,12 +66,12 @@ public class InventoryTableSeeder {
                         + "('P009', 'Slime', 99, 13.5, 'Toy')");
 
                 this.statement.executeBatch();
-                System.out.println(TABLE_PRODUCTS + " table created and seeded successfully.");
+                logStatus("Created", TABLE_PRODUCTS, true, null);
             } else {
                 System.out.println(TABLE_PRODUCTS + " table already exists. No action taken.");
             }
         } catch (SQLException ex) {
-            System.err.println("SQLException during seeding: " + ex.getMessage());
+            logStatus("Create", TABLE_PRODUCTS, false, ex.getMessage());
         }
     }
 
@@ -85,12 +86,12 @@ public class InventoryTableSeeder {
                         + COL_PRICE + " DOUBLE, "
                         + COL_TYPE + " VARCHAR(20))");
 
-                System.out.println(TABLE_BACKUP + " table created successfully.");
+                logStatus("Created", TABLE_BACKUP, true, null);
             } else {
                 System.out.println(TABLE_BACKUP + " table already exists. No action taken.");
             }
         } catch (SQLException ex) {
-            System.err.println("SQLException during creating backup table: " + ex.getMessage());
+            logStatus("Create", TABLE_BACKUP, false, ex.getMessage());
         }
     }
 
@@ -104,12 +105,12 @@ public class InventoryTableSeeder {
                         + COL_ACTION + " VARCHAR(255), "
                         + COL_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 
-                System.out.println(TABLE_LOGS + " table created successfully.");
+                logStatus("Created", TABLE_LOGS, true, null);
             } else {
                 System.out.println(TABLE_LOGS + " table already exists. No action taken.");
             }
         } catch (SQLException ex) {
-            System.err.println("SQLException during creating logs table: " + ex.getMessage());
+            logStatus("Create", TABLE_LOGS, false, ex.getMessage());
         }
     }
 
@@ -121,12 +122,45 @@ public class InventoryTableSeeder {
             rs.close();
             return exists;
         } catch (SQLException ex) {
-            System.err.println("SQLException checking table: " + ex.getMessage());
+            logStatus("Check", "if table " + tableName + " exists", false, ex.getMessage());
             return false;
         }
     }
 
     public void closeConnection() {
         DatabaseManager.getInstance().closeConnections();
+    }
+
+    public void resetProductsTable() {
+        try {
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("DROP TABLE " + TABLE_PRODUCTS);
+            createAndSeedProductsTable();
+            logStatus("Reset", TABLE_PRODUCTS, true, null);
+        } catch (SQLException ex) {
+            logStatus("Reset", TABLE_PRODUCTS, false, ex.getMessage());
+        }
+    }
+
+    public void resetLogsTable() {
+        try {
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("DROP TABLE " + TABLE_LOGS);
+            createLogsTable();
+            logStatus("Reset", TABLE_LOGS, true, null);
+        } catch (SQLException ex) {
+            logStatus("Reset", TABLE_LOGS, false, ex.getMessage());
+        }
+    }
+
+    public void resetBackupTable() {
+        try {
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("DROP TABLE " + TABLE_BACKUP);
+            createBackupProductsTable();
+            logStatus("Reset", TABLE_BACKUP, true, null);
+        } catch (SQLException ex) {
+            logStatus("Reset", TABLE_BACKUP, false, ex.getMessage());
+        }
     }
 }
