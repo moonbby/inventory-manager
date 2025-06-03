@@ -29,7 +29,7 @@ public interface IInventoryManager {
      * 
      * @param id the product ID
      */
-    void removeProduct(String id);
+    boolean removeProduct(String id);
 
     /**
      * Decreases the quantity of a given product.
@@ -37,7 +37,7 @@ public interface IInventoryManager {
      * @param id the product ID
      * @param quantity the quantity to reduce
      */
-    void reduceQuantity(String id, int quantity);
+    boolean reduceQuantity(String id, int quantity);
 
     /**
      * Increases the quantity of a given product.
@@ -45,7 +45,7 @@ public interface IInventoryManager {
      * @param id the product ID
      * @param quantity the quantity to add
      */
-    void addQuantity(String id, int quantity);
+    boolean addQuantity(String id, int quantity);
 
     /**
      * Retrieves a product by its ID.

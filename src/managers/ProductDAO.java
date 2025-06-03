@@ -62,7 +62,7 @@ public class ProductDAO implements IProductReader, IProductWriter {
     }
 
     @Override
-    public void removeProduct(String id) {
+    public boolean removeProduct(String id) {
         try {
             String sql = "DELETE FROM " + TABLE_PRODUCTS + " WHERE " + COL_PRODUCT_ID + " = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -72,13 +72,15 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ps.close();
 
             logManager.log("Removed", "product " + id, true, null);
+            return true;
         } catch (SQLException ex) {
             logManager.log("Remove", "product " + id, false, ex.getMessage());
+        return false;
         }
     }
 
     @Override
-    public void updateQuantity(String id, int newQuantity) {
+    public boolean updateQuantity(String id, int newQuantity) {
         try {
             String sql = "UPDATE " + TABLE_PRODUCTS + " SET " + COL_QUANTITY + " = ? WHERE " + COL_PRODUCT_ID + " = ?";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -89,8 +91,10 @@ public class ProductDAO implements IProductReader, IProductWriter {
             ps.close();
 
             logManager.log("Updated", "quantity for product " + id, true, null);
+            return true;
         } catch (SQLException ex) {
             logManager.log("Update", "quantity for product " + id, false, ex.getMessage());
+            return false;
         }
     }
 

@@ -5,7 +5,6 @@
 package managers;
 
 import interfaces.IInventoryManager;
-import java.util.Collection;
 import java.util.List;
 import models.Product;
 
@@ -28,28 +27,32 @@ public class InventoryManager implements IInventoryManager {
 
     // Removes a product from the inventory by its ID.
     @Override
-    public void removeProduct(String id) {
-        productDAO.removeProduct(id);
+    public boolean removeProduct(String id) {
+        return productDAO.removeProduct(id);
     }
 
     // Reduces the quantity of the specified product, preventing negative stock.
     @Override
-    public void reduceQuantity(String id, int quantity) {
+    public boolean reduceQuantity(String id, int quantity) {
         Product product = getProduct(id);
         if (product != null) {
             int newQuantity = Math.max(product.getQuantity() - quantity, 0);
-            productDAO.updateQuantity(id, newQuantity);
+            return productDAO.updateQuantity(id, newQuantity);
         }
+        
+        return false;
     }
 
     // Increases the quantity of the specified product.
     @Override
-    public void addQuantity(String id, int quantity) {
+    public boolean addQuantity(String id, int quantity) {
         Product product = getProduct(id);
         if (product != null) {
             int newQuantity = product.getQuantity() + quantity;
-            productDAO.updateQuantity(id, newQuantity);
+            return productDAO.updateQuantity(id, newQuantity);
         }
+        
+        return false;
     }
 
     // Retrieves a product by its ID.

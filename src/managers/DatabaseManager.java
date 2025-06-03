@@ -32,7 +32,11 @@ public class DatabaseManager {
     }
 
     public Connection getConnection() {
-        if (conn == null) {
+        try {
+            if (conn == null || conn.isClosed()) {
+                establishConnection();
+            }
+        } catch (SQLException e) {
             establishConnection();
         }
         return conn;
@@ -66,7 +70,7 @@ public class DatabaseManager {
             try {
                 conn.close();
             } catch (SQLException ex) {
-                
+
             }
         }
     }

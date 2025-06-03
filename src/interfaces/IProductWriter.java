@@ -14,7 +14,7 @@ public interface IProductWriter {
     
     Product addProduct(String type, String name, int quantity, double price);
 
-    void removeProduct(String id);
+    boolean removeProduct(String id);
 
-    void updateQuantity(String id, int newQuantity);
+    boolean updateQuantity(String id, int newQuantity);
 }
