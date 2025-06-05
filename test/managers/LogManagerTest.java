@@ -101,10 +101,14 @@ public class LogManagerTest {
      */
     @Test
     public void testGetLogs() {
-        logManager.logRaw("This is a test.");
+        String testMessage = "This is a test.";
+        logManager.logRaw(testMessage);
 
         List<String> logs = logManager.getLogs();
         assertFalse(logs.isEmpty());
+
+        boolean found = logs.stream().anyMatch(log -> log.contains(testMessage));
+        assertTrue("Expected log message not found in logs", found);
     }
 
     /**
@@ -112,19 +116,17 @@ public class LogManagerTest {
      */
     @Test
     public void testResetLogs() {
-        int initialSize = logManager.getLogs().size();
         logManager.logRaw("Dummy log 1");
         logManager.logRaw("Dummy log 2");
-        int afterSize = logManager.getLogs().size();
-        assertTrue(afterSize >= initialSize + 2);
 
         logManager.resetLogs();
+        List<String> logsAfterReset = logManager.getLogs();
 
-        List<String> after = logManager.getLogs();
-        for (String log : after) {
-            assertFalse(log.contains("Dummy log 1"));
-            assertFalse(log.contains("Dummy log 2"));
-        }
+        boolean dummy1Exists = logsAfterReset.stream().anyMatch(log -> log.contains("Dummy log 1"));
+        boolean dummy2Exists = logsAfterReset.stream().anyMatch(log -> log.contains("Dummy log 2"));
+
+        assertFalse("Dummy log 1 should be cleared", dummy1Exists);
+        assertFalse("Dummy log 2 should be cleared", dummy2Exists);
     }
 
 }

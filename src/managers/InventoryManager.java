@@ -7,6 +7,7 @@ package managers;
 import interfaces.IInventoryManager;
 import java.util.List;
 import models.Product;
+import utils.ProductTypes;
 
 /**
  * Concrete implementation of IInventoryManager for in-memory inventory control.
@@ -22,6 +23,16 @@ public class InventoryManager implements IInventoryManager {
     // Adds a product to the inventory by its unique ID.
     @Override
     public Product addProduct(String type, String name, int quantity, double price) {
+        if (type == null || (!type.equalsIgnoreCase(ProductTypes.CLOTHING) && !type.equalsIgnoreCase(ProductTypes.TOY))) {
+            return null;
+        }
+        if (name == null || name.trim().isEmpty()) {
+            return null;
+        }
+        if (quantity < 0 || price < 0) {
+            return null;
+        }
+        
         return productDAO.addProduct(type, name, quantity, price);
     }
 
@@ -34,24 +45,31 @@ public class InventoryManager implements IInventoryManager {
     // Reduces the quantity of the specified product, preventing negative stock.
     @Override
     public boolean reduceQuantity(String id, int quantity) {
+        if (quantity < 0) {
+            return false;
+        }
+
         Product product = getProduct(id);
         if (product != null) {
             int newQuantity = Math.max(product.getQuantity() - quantity, 0);
             return productDAO.updateQuantity(id, newQuantity);
         }
-        
+
         return false;
     }
 
     // Increases the quantity of the specified product.
     @Override
     public boolean addQuantity(String id, int quantity) {
+        if (quantity < 0) {
+            return false;
+        }
+
         Product product = getProduct(id);
         if (product != null) {
             int newQuantity = product.getQuantity() + quantity;
             return productDAO.updateQuantity(id, newQuantity);
         }
-        
         return false;
     }
 

@@ -68,14 +68,19 @@ public class ProductDAO implements IProductReader, IProductWriter {
             PreparedStatement ps = conn.prepareStatement(sql);
 
             ps.setString(1, id);
-            ps.executeUpdate();
+            int affected = ps.executeUpdate();
             ps.close();
 
-            logManager.log("Removed", "product " + id, true, null);
-            return true;
+            if (affected > 0) {
+                logManager.log("Removed", "product " + id, true, null);
+            } else {
+                logManager.log("Remove", "product " + id, false, "No matching product found");
+            }
+
+            return affected > 0;
         } catch (SQLException ex) {
             logManager.log("Remove", "product " + id, false, ex.getMessage());
-        return false;
+            return false;
         }
     }
 

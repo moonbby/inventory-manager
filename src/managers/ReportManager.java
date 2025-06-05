@@ -23,8 +23,6 @@ public class ReportManager {
 
     /**
      * Prints a summary of product counts by category.
-     *
-     * @param products the current list of inventory items
      */
     public void showSummaryReport() {
         try {
@@ -57,8 +55,6 @@ public class ReportManager {
      * Displays the most expensive product in the inventory.
      *
      * Prints product details or a warning if the inventory is empty.
-     *
-     * @param products the current list of inventory items
      */
     public void showMostExpensiveProduct() {
         try {

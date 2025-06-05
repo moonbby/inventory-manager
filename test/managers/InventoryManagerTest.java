@@ -67,6 +67,36 @@ public class InventoryManagerTest {
         assertEquals("Clothing", product.getProductType());
     }
 
+    @Test
+    public void testAddProduct_InvalidType() {
+        Product result = inventoryManager.addProduct("Food", "Apple", 10, 5.0);
+        assertNull(result);
+    }
+
+    @Test
+    public void testAddProduct_NegativeQuantity() {
+        Product result = inventoryManager.addProduct("Toy", "Negative", -5, 5.0);
+        assertNull(result);
+    }
+
+    @Test
+    public void testAddProduct_NegativePrice() {
+        Product result = inventoryManager.addProduct("Toy", "Freebie", 1, -3.0);
+        assertNull(result);
+    }
+
+    @Test
+    public void testAddProduct_NullName() {
+        Product result = inventoryManager.addProduct("Clothing", null, 1, 10.0);
+        assertNull(result);
+    }
+
+    @Test
+    public void testAddProduct_EmptyName() {
+        Product result = inventoryManager.addProduct("Toy", "", 1, 10.0);
+        assertNull(result);
+    }
+
     /**
      * Test of removeProduct method, of class InventoryManager.
      */
@@ -76,6 +106,11 @@ public class InventoryManagerTest {
         boolean removed = inventoryManager.removeProduct(product.getID());
         assertTrue(removed);
         assertNull(inventoryManager.getProduct(product.getID()));
+    }
+
+    @Test
+    public void testRemoveProduct_InvalidID() {
+        assertFalse(inventoryManager.removeProduct("NO_SUCH_ID"));
     }
 
     /**
@@ -90,11 +125,25 @@ public class InventoryManagerTest {
     }
 
     @Test
+    public void testReduceQuantity_NegativeQuantity() {
+        Product product = inventoryManager.addProduct("Clothing", "Test", 10, 10.99);
+        boolean updated = inventoryManager.reduceQuantity(product.getID(), -2);
+        assertFalse(updated);
+        assertEquals(10, inventoryManager.getProduct(product.getID()).getQuantity());
+    }
+
+    @Test
+    public void testReduceQuantity_InvalidID() {
+        boolean updated = inventoryManager.reduceQuantity("INVALID_ID", 5);
+        assertFalse(updated);
+    }
+
+    @Test
     public void testReduceQuantity_BeyondStock() {
-        Product p = inventoryManager.addProduct("Toy", "Undersell", 2, 5.99);
-        boolean result = inventoryManager.reduceQuantity(p.getID(), 10);
+        Product product = inventoryManager.addProduct("Toy", "Undersell", 2, 5.99);
+        boolean result = inventoryManager.reduceQuantity(product.getID(), 10);
         assertTrue(result);
-        assertEquals(0, inventoryManager.getProduct(p.getID()).getQuantity());
+        assertEquals(0, inventoryManager.getProduct(product.getID()).getQuantity());
     }
 
     /**
@@ -108,6 +157,19 @@ public class InventoryManagerTest {
         assertEquals(15, inventoryManager.getProduct(product.getID()).getQuantity());
     }
 
+    @Test
+    public void testAddQuantity_NegativeQuantity() {
+        Product product = inventoryManager.addProduct("Toy", "Test", 3, 9.99);
+        boolean updated = inventoryManager.addQuantity(product.getID(), -2);
+        assertFalse(updated);
+        assertEquals(3, inventoryManager.getProduct(product.getID()).getQuantity());
+    }
+
+    @Test
+    public void testAddQuantity_InvalidID() {
+        assertFalse(inventoryManager.addQuantity("INVALID_ID", 3));
+    }
+
     /**
      * Test of getProduct method, of class InventoryManager.
      */
@@ -117,6 +179,11 @@ public class InventoryManagerTest {
         Product fetched = inventoryManager.getProduct(added.getID());
         assertNotNull(fetched);
         assertEquals("Test Toy", fetched.getName());
+    }
+
+    @Test
+    public void testGetProduct_InvalidID() {
+        assertNull(inventoryManager.getProduct("INVALID_ID"));
     }
 
     /**
@@ -135,13 +202,13 @@ public class InventoryManagerTest {
      * Test of hasProduct method, of class InventoryManager.
      */
     @Test
-    public void testHasProduct_PositiveCase() {
+    public void testHasProduct_True() {
         boolean result = inventoryManager.hasProduct("P001"); // seeded product
         assertTrue(result);
     }
 
     @Test
-    public void testHasProduct_NegativeCase() {
+    public void testHasProduct_False() {
         boolean result = inventoryManager.hasProduct("NON_EXISTENT");
         assertFalse(result);
     }
