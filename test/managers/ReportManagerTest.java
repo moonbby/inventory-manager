@@ -21,6 +21,7 @@ public class ReportManagerTest {
 
     private ReportManager reportManager;
     private InventoryManager inventoryManager;
+    private LogManager logManager;
     private static InventoryTableSeeder seeder;
 
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -51,9 +52,10 @@ public class ReportManagerTest {
         seeder.resetProductsTable();
         seeder.resetLogsTable();
         seeder.resetBackupTable();
-
-        this.reportManager = new ReportManager();
+        
         this.inventoryManager = new InventoryManager();
+        this.logManager = new LogManager();
+        this.reportManager = new ReportManager(inventoryManager, logManager);
 
         System.setOut(new PrintStream(outContent));
     }
