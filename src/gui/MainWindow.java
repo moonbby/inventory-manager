@@ -10,6 +10,8 @@ import java.awt.CardLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import managers.BackupManager;
+import managers.DeveloperManager;
 import managers.InventoryManager;
 import managers.LogManager;
 import managers.ReportManager;
@@ -19,12 +21,19 @@ import managers.ReportManager;
  * @author lifeo
  */
 public class MainWindow extends JFrame {
-    
+
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private IInventoryManager inventoryManager = new InventoryManager();
     private LogManager logManager = new LogManager();
+    private BackupManager backupManager = new BackupManager(logManager);
     private ReportManager reportManager = new ReportManager(inventoryManager, logManager);
+    private DeveloperManager devManager = new DeveloperManager();
+    private ProductPanel productPanel;
+    private ReportPanel reportPanel;
+    private BackupPanel backupPanel;
+    private LogPanel logPanel;
+    private DeveloperPanel developerPanel;
 
     public MainWindow() {
         setTitle("Inventory Management System");
@@ -37,29 +46,39 @@ public class MainWindow extends JFrame {
     private void initUI() {
         JPanel navPanel = new JPanel();
         JButton btnProducts = new JButton("Products");
-        JButton btnUtilities = new JButton("Utilities");
         JButton btnReports = new JButton("Reports");
+        JButton btnBackup = new JButton("Backup");
+        JButton btnLog = new JButton("Logs");
         JButton btnDeveloper = new JButton("Developer");
         navPanel.add(btnProducts);
-        navPanel.add(btnUtilities);
         navPanel.add(btnReports);
+        navPanel.add(btnBackup);
+        navPanel.add(btnLog);
         navPanel.add(btnDeveloper);
 
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
-        
-        cardPanel.add(new ProductPanel(inventoryManager, logManager), "PRODUCTS");
-        cardPanel.add(new UtilityPanel(), "UTILITIES");
-        cardPanel.add(new ReportPanel(reportManager, logManager), "REPORTS");
-        cardPanel.add(new DeveloperPanel(), "DEVELOPER");
+
+        productPanel = new ProductPanel(inventoryManager, logManager);
+        reportPanel = new ReportPanel(reportManager, logManager);
+        backupPanel = new BackupPanel(backupManager, logManager);
+        logPanel = new LogPanel(logManager);
+        developerPanel = new DeveloperPanel(devManager, logManager, productPanel, logPanel, backupPanel);
+
+        cardPanel.add(productPanel, "PRODUCTS");
+        cardPanel.add(reportPanel, "REPORTS");
+        cardPanel.add(backupPanel, "BACKUP");
+        cardPanel.add(logPanel, "LOGS");
+        cardPanel.add(developerPanel, "DEVELOPER");
 
         setLayout(new BorderLayout());
         add(navPanel, BorderLayout.NORTH);
         add(cardPanel, BorderLayout.CENTER);
-        
+
         btnProducts.addActionListener(e -> cardLayout.show(cardPanel, "PRODUCTS"));
-        btnUtilities.addActionListener(e -> cardLayout.show(cardPanel, "UTILITIES"));
         btnReports.addActionListener(e -> cardLayout.show(cardPanel, "REPORTS"));
+        btnBackup.addActionListener(e -> cardLayout.show(cardPanel, "BACKUP"));
+        btnLog.addActionListener(e -> cardLayout.show(cardPanel, "LOGS"));
         btnDeveloper.addActionListener(e -> cardLayout.show(cardPanel, "DEVELOPER"));
     }
 }

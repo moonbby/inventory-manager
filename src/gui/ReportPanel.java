@@ -35,11 +35,11 @@ public class ReportPanel extends JPanel {
         this.logManager = logManager;
 
         setLayout(new BorderLayout());
-        initReportOptions();
+        initReportActions();
         initProductTable();
     }
 
-    public void initReportOptions() {
+    public void initReportActions() {
         JButton btnSummary = new JButton("Summary Report");
         JButton btnMostExpensive = new JButton("Most Expensive Product");
         JButton btnLowStock = new JButton("Low Stock Product");
@@ -104,7 +104,7 @@ public class ReportPanel extends JPanel {
         Product expensive = reportManager.getMostExpensiveProduct();
         if (expensive != null) {
             products.add(expensive);
-            refreshTable(products);
+            refreshReportTable(products);
 
             table.setVisible(true);
             scrollPane.setVisible(true);
@@ -125,7 +125,7 @@ public class ReportPanel extends JPanel {
                         "Invalid Input", JOptionPane.ERROR_MESSAGE);
             } else {
                 List<Product> products = reportManager.exportLowStockMenu(threshold);
-                refreshTable(products);
+                refreshReportTable(products);
 
                 table.setVisible(true);
                 scrollPane.setVisible(true);
@@ -138,7 +138,7 @@ public class ReportPanel extends JPanel {
         }
     }
 
-    public void refreshTable(List<Product> products) {
+    public void refreshReportTable(List<Product> products) {
         String[] columns = {"ID", "Type", "Name", "Quantity", "Price"};
         DefaultTableModel productModel = new DefaultTableModel(columns, 0) {
             @Override

@@ -4,12 +4,73 @@
  */
 package gui;
 
+import java.awt.BorderLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import managers.DeveloperManager;
+import managers.LogManager;
 
 /**
  *
  * @author lifeo
  */
 public class DeveloperPanel extends JPanel {
+
+    private DeveloperManager devManager;
+    private LogManager logManager;
+    private final ProductPanel productPanel;
+    private final LogPanel logPanel;
+    private final BackupPanel backupPanel;
+
+    public DeveloperPanel(DeveloperManager devManager, LogManager logManager,
+            ProductPanel productPanel, LogPanel logPanel, BackupPanel backupPanel) {
+        this.devManager = devManager;
+        this.logManager = logManager;
+        this.productPanel = productPanel;
+        this.logPanel = logPanel;
+        this.backupPanel = backupPanel;
+
+        setLayout(new BorderLayout());
+        initDevActions();
+    }
+
+    public void initDevActions() {
+        JButton btnResetProducts = new JButton("Reset Products");
+        JButton btnResetLogs = new JButton("Reset Logs");
+        JButton btnResetBackup = new JButton("Reset Backup");
+
+        btnResetProducts.addActionListener(e -> handleResetProducts());
+        btnResetLogs.addActionListener(e -> handleResetLogs());
+        btnResetBackup.addActionListener(e -> handleResetBackup());
+
+        JPanel btnPanel = new JPanel();
+        btnPanel.setBorder(BorderFactory.createTitledBorder("DEVELOPER TOOLS"));
+        btnPanel.add(btnResetProducts);
+        btnPanel.add(btnResetLogs);
+        btnPanel.add(btnResetBackup);
+        add(btnPanel);
+    }
+
+    private void handleResetProducts() {
+        devManager.resetProductTable();
+        productPanel.refreshProductTable();
+        JOptionPane.showMessageDialog(this, "Products reset successfully!",
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
     
+    private void handleResetLogs() {
+        devManager.resetLogTable();
+        logPanel.refreshLogTable();
+        JOptionPane.showMessageDialog(this, "Logs reset successfully!",
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    private void handleResetBackup() {
+        devManager.resetBackupTable();
+        backupPanel.refreshBackupTable();
+        JOptionPane.showMessageDialog(this, "Backup reset successfully!",
+                "Success", JOptionPane.INFORMATION_MESSAGE);
+    }
 }

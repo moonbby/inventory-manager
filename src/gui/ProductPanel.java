@@ -64,7 +64,12 @@ public class ProductPanel extends JPanel {
 
     public void initProductTable() {
         String[] columns = {"ID", "Type", "Name", "Quantity", "Price"};
-        tableModel = new DefaultTableModel(columns, 0);
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -74,7 +79,7 @@ public class ProductPanel extends JPanel {
         centPanel.add(new JScrollPane(table));
         add(centPanel, BorderLayout.CENTER);
 
-        refreshTable();
+        refreshProductTable();
     }
 
     public void initProductActions() {
@@ -119,13 +124,13 @@ public class ProductPanel extends JPanel {
                         "Failed to add product. Please check that all fields are valid.",
                         "Invalid Input", JOptionPane.ERROR_MESSAGE);
             } else {
+                refreshProductTable();
                 JOptionPane.showMessageDialog(this, "Product added successfully!",
                         "Success", JOptionPane.INFORMATION_MESSAGE);
                 cmbType.setSelectedIndex(0);
                 txtName.setText("Name");
                 txtQuantity.setText("Quantity");
                 txtPrice.setText("Price");
-                refreshTable();
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Please enter valid numbers.",
@@ -138,9 +143,9 @@ public class ProductPanel extends JPanel {
         if (selectedRow != -1) {
             String productId = table.getValueAt(selectedRow, 0).toString();
             inventoryManager.removeProduct(productId);
+            refreshProductTable();
             JOptionPane.showMessageDialog(this, "Product removed successfully!",
                     "Success", JOptionPane.INFORMATION_MESSAGE);
-            refreshTable();
         }
     }
 
@@ -157,9 +162,9 @@ public class ProductPanel extends JPanel {
                             "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 } else {
                     inventoryManager.addQuantity(productId, quantity);
+                    refreshProductTable();
                     JOptionPane.showMessageDialog(this, "Product restocked successfully!",
                             "Success", JOptionPane.INFORMATION_MESSAGE);
-                    refreshTable();
                 }
             }
         } catch (NumberFormatException ex) {
@@ -182,9 +187,9 @@ public class ProductPanel extends JPanel {
                             "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 } else {
                     inventoryManager.reduceQuantity(productId, quantity);
+                    refreshProductTable();
                     JOptionPane.showMessageDialog(this, "Product purchased successfully!",
                             "Success", JOptionPane.INFORMATION_MESSAGE);
-                    refreshTable();
                 }
             }
         } catch (NumberFormatException ex) {
@@ -193,7 +198,7 @@ public class ProductPanel extends JPanel {
         }
     }
 
-    public void refreshTable() {
+    public void refreshProductTable() {
         List<Product> products = inventoryManager.getAllProducts();
         tableModel.setRowCount(0);
         for (Product p : products) {

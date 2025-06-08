@@ -64,8 +64,8 @@ public class LogManager {
     }
 
     // Returns all log entries from the log file as a list of strings.
-    public List<String> getLogs() {
-        List<String> logs = new ArrayList<String>();
+    public List<Object[]> getLogs() {
+        List<Object[]> logs = new ArrayList<>();
 
         try {
             String sql = "SELECT * FROM " + TABLE_LOGS + " ORDER BY " + COL_TIMESTAMP + " ASC";
@@ -77,7 +77,7 @@ public class LogManager {
                 String action = rs.getString(2);
                 Timestamp timestamp = rs.getTimestamp(3);
 
-                logs.add("ID: " + id + " | Action: " + action + " | Time: " + timestamp);
+                logs.add(new Object[]{id, action, timestamp});
             }
             ps.close();
             rs.close();
