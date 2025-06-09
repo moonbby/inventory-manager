@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 /**
  * Handles logging of user activity and system events for audit and
@@ -66,7 +67,8 @@ public class LogManager {
     // Returns all log entries from the log file as a list of strings.
     public List<Object[]> getLogs() {
         List<Object[]> logs = new ArrayList<>();
-
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        
         try {
             String sql = "SELECT * FROM " + TABLE_LOGS + " ORDER BY " + COL_TIMESTAMP + " ASC";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -76,8 +78,9 @@ public class LogManager {
                 int id = rs.getInt(1);
                 String action = rs.getString(2);
                 Timestamp timestamp = rs.getTimestamp(3);
+                String formattedTime = formatter.format(timestamp);
 
-                logs.add(new Object[]{id, action, timestamp});
+                logs.add(new Object[]{id, action, formattedTime});
             }
             ps.close();
             rs.close();

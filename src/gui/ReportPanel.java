@@ -13,7 +13,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import managers.LogManager;
 import managers.ReportManager;
@@ -26,13 +25,11 @@ import models.Product;
 public class ReportPanel extends JPanel {
 
     private ReportManager reportManager;
-    private LogManager logManager;
     private JTable table;
     JScrollPane scrollPane;
 
-    public ReportPanel(ReportManager reportManager, LogManager logManager) {
+    public ReportPanel(ReportManager reportManager) {
         this.reportManager = reportManager;
-        this.logManager = logManager;
 
         setLayout(new BorderLayout());
         initReportActions();

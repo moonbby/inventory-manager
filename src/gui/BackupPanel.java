@@ -15,7 +15,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import managers.BackupManager;
-import managers.LogManager;
 import models.Product;
 
 /**
@@ -24,14 +23,12 @@ import models.Product;
  */
 public class BackupPanel extends JPanel {
 
-    private BackupManager backupManager;
-    private LogManager logManager;
+    private final BackupManager backupManager;
     private JTable table;
     private DefaultTableModel tableModel;
 
-    public BackupPanel(BackupManager backupManager, LogManager logManager) {
+    public BackupPanel(BackupManager backupManager) {
         this.backupManager = backupManager;
-        this.logManager = logManager;
 
         setLayout(new BorderLayout());
         initBackupActions();

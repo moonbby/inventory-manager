@@ -87,15 +87,40 @@ public class ProductDAO implements IProductReader, IProductWriter {
     @Override
     public boolean updateQuantity(String id, int newQuantity) {
         try {
-            String sql = "UPDATE " + TABLE_PRODUCTS + " SET " + COL_QUANTITY + " = ? WHERE " + COL_PRODUCT_ID + " = ?";
-            PreparedStatement ps = conn.prepareStatement(sql);
+            String selectSql = "SELECT " + COL_QUANTITY + " FROM " + TABLE_PRODUCTS + " WHERE " + COL_PRODUCT_ID + " = ?";
+            PreparedStatement selectPs = conn.prepareStatement(selectSql);
+            selectPs.setString(1, id);
+            ResultSet rs = selectPs.executeQuery();
 
-            ps.setInt(1, newQuantity);
-            ps.setString(2, id);
-            ps.executeUpdate();
-            ps.close();
+            int currentQuantity = -1;
+            if (rs.next()) {
+                currentQuantity = rs.getInt(COL_QUANTITY);
+            }
+            rs.close();
+            selectPs.close();
 
-            logManager.log("Updated", "quantity for product " + id, true, null);
+            if (currentQuantity == -1) {
+                logManager.log("Update", "quantity for product " + id, false, "Product not found.");
+                return false;
+            }
+
+            String updateSql = "UPDATE " + TABLE_PRODUCTS + " SET " + COL_QUANTITY + " = ? WHERE " + COL_PRODUCT_ID + " = ?";
+            PreparedStatement updatePs = conn.prepareStatement(updateSql);
+            updatePs.setInt(1, newQuantity);
+            updatePs.setString(2, id);
+            updatePs.executeUpdate();
+            updatePs.close();
+
+            if (newQuantity > currentQuantity) {
+                logManager.log("Restocked", "product " + id + " (+"
+                        + (newQuantity - currentQuantity) + ")", true, null);
+            } else if (newQuantity < currentQuantity) {
+                logManager.log("Purchased", "product " + id + " (-"
+                        + (currentQuantity - newQuantity) + ")", true, null);
+            } else {
+                logManager.log("Updated", "product " + id + " (no quantity change)", true, null);
+            }
+
             return true;
         } catch (SQLException ex) {
             logManager.log("Update", "quantity for product " + id, false, ex.getMessage());

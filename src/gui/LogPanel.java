@@ -8,7 +8,6 @@ import java.awt.BorderLayout;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -58,9 +57,9 @@ public class LogPanel extends JPanel {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-        table.getColumnModel().getColumn(0).setPreferredWidth(30);
-        table.getColumnModel().getColumn(1).setPreferredWidth(285);
-        table.getColumnModel().getColumn(2).setPreferredWidth(135);
+        table.getColumnModel().getColumn(0).setPreferredWidth(35);
+        table.getColumnModel().getColumn(1).setPreferredWidth(302);
+        table.getColumnModel().getColumn(2).setPreferredWidth(111);
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel centerWrapper = new JPanel();

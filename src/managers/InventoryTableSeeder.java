@@ -56,10 +56,10 @@ public class InventoryTableSeeder {
                         + COL_QUANTITY + " INT, "
                         + COL_PRICE + " DOUBLE, "
                         + COL_TYPE + " VARCHAR(20))");
-                logManager.log("Created", TABLE_PRODUCTS, true, null);
+                logManager.log("Created", "products table", true, null);
                 seedProductsTable();
             } catch (SQLException ex) {
-                logManager.log("Create", TABLE_PRODUCTS, false, ex.getMessage());
+                logManager.log("Create", "products table", false, ex.getMessage());
             } finally {
                 if (statement != null) {
                     try {
@@ -69,7 +69,7 @@ public class InventoryTableSeeder {
                 }
             }
         } else {
-            logManager.log("Check", TABLE_PRODUCTS, true, "Table already exists. Skipped creation.");
+            logManager.log("Check", "products table", true, "Table already exists. Skipped creation.");
         }
     }
 
@@ -88,9 +88,9 @@ public class InventoryTableSeeder {
                     + "('P008', 'Teddy Bear', 100, 21.99, 'Toy'),"
                     + "('P009', 'Slime', 99, 13.5, 'Toy')");
             statement.executeBatch();
-            logManager.log("Seeded", TABLE_PRODUCTS, true, null);
+            logManager.log("Seeded", "products table", true, null);
         } catch (SQLException ex) {
-            logManager.log("Seed", TABLE_PRODUCTS, false, ex.getMessage());
+            logManager.log("Seed", "products table", false, ex.getMessage());
         } finally {
             if (statement != null) {
                 try {
@@ -112,9 +112,9 @@ public class InventoryTableSeeder {
                         + COL_QUANTITY + " INT, "
                         + COL_PRICE + " DOUBLE, "
                         + COL_TYPE + " VARCHAR(20))");
-                logManager.log("Created", TABLE_BACKUP, true, null);
+                logManager.log("Created", "backup table", true, null);
             } catch (SQLException ex) {
-                logManager.log("Create", TABLE_BACKUP, false, ex.getMessage());
+                logManager.log("Create", "backup table", false, ex.getMessage());
             } finally {
                 if (statement != null) {
                     try {
@@ -124,7 +124,7 @@ public class InventoryTableSeeder {
                 }
             }
         } else {
-            logManager.log("Check", TABLE_BACKUP, true, "Table already exists. Skipped creation.");
+            logManager.log("Check", "backup table", true, "Table already exists. Skipped creation.");
         }
     }
 
@@ -137,9 +137,9 @@ public class InventoryTableSeeder {
                         + COL_LOG_ID + " INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
                         + COL_ACTION + " VARCHAR(255), "
                         + COL_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-                logManager.log("Created", TABLE_LOGS, true, null);
+                logManager.log("Created", "logs table", true, null);
             } catch (SQLException ex) {
-                logManager.log("Create", TABLE_LOGS, false, ex.getMessage());
+                logManager.log("Create", "logs table", false, ex.getMessage());
             } finally {
                 if (statement != null) {
                     try {
@@ -149,7 +149,7 @@ public class InventoryTableSeeder {
                 }
             }
         } else {
-            logManager.log("Check", TABLE_LOGS, true, "Table already exists. Skipped creation.");
+            logManager.log("Check", "logs table", true, "Table already exists. Skipped creation.");
         }
     }
 
@@ -158,10 +158,10 @@ public class InventoryTableSeeder {
         try {
             statement = conn.createStatement();
             statement.executeUpdate("DELETE FROM " + TABLE_PRODUCTS);
-            logManager.log("Reset", TABLE_PRODUCTS, true, null);
+            logManager.log("Reset", "products table", true, null);
             seedProductsTable();
         } catch (SQLException ex) {
-            logManager.log("Reset", TABLE_PRODUCTS, false, ex.getMessage());
+            logManager.log("Reset", "products table", false, ex.getMessage());
         } finally {
             if (statement != null) {
                 try {
@@ -177,9 +177,10 @@ public class InventoryTableSeeder {
         try {
             statement = conn.createStatement();
             statement.executeUpdate("DELETE FROM " + TABLE_LOGS);
-            logManager.log("Reset", TABLE_LOGS, true, null);
+            statement.executeUpdate("ALTER TABLE " + TABLE_LOGS + " ALTER COLUMN " + COL_LOG_ID + " RESTART WITH 1");
+            logManager.log("Reset", "logs table", true, null);
         } catch (SQLException ex) {
-            logManager.log("Reset", TABLE_LOGS, false, ex.getMessage());
+            logManager.log("Reset", "logs table", false, ex.getMessage());
         } finally {
             if (statement != null) {
                 try {
@@ -195,9 +196,9 @@ public class InventoryTableSeeder {
         try {
             statement = conn.createStatement();
             statement.executeUpdate("DELETE FROM " + TABLE_BACKUP);
-            logManager.log("Reset", TABLE_BACKUP, true, null);
+            logManager.log("Reset", "backup table", true, null);
         } catch (SQLException ex) {
-            logManager.log("Reset", TABLE_BACKUP, false, ex.getMessage());
+            logManager.log("Reset", "backup table", false, ex.getMessage());
         } finally {
             if (statement != null) {
                 try {

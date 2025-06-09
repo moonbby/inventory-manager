@@ -29,7 +29,7 @@ public class InventoryManager implements IInventoryManager {
         if (name == null || name.trim().isEmpty()) {
             return null;
         }
-        if (quantity < 0 || price < 0) {
+        if (quantity < 0 || price <= 0) {
             return null;
         }
         

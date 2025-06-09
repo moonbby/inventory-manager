@@ -24,11 +24,11 @@ public class MainWindow extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel cardPanel;
-    private IInventoryManager inventoryManager = new InventoryManager();
-    private LogManager logManager = new LogManager();
-    private BackupManager backupManager = new BackupManager(logManager);
-    private ReportManager reportManager = new ReportManager(inventoryManager, logManager);
-    private DeveloperManager devManager = new DeveloperManager();
+    private final IInventoryManager inventoryManager = new InventoryManager();
+    private final LogManager logManager = new LogManager();
+    private final BackupManager backupManager = new BackupManager(logManager);
+    private final ReportManager reportManager = new ReportManager(inventoryManager, logManager);
+    private final DeveloperManager devManager = new DeveloperManager();
     private ProductPanel productPanel;
     private ReportPanel reportPanel;
     private BackupPanel backupPanel;
@@ -59,11 +59,11 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        productPanel = new ProductPanel(inventoryManager, logManager);
-        reportPanel = new ReportPanel(reportManager, logManager);
-        backupPanel = new BackupPanel(backupManager, logManager);
+        productPanel = new ProductPanel(inventoryManager);
+        reportPanel = new ReportPanel(reportManager);
+        backupPanel = new BackupPanel(backupManager);
         logPanel = new LogPanel(logManager);
-        developerPanel = new DeveloperPanel(devManager, logManager, productPanel, logPanel, backupPanel);
+        developerPanel = new DeveloperPanel(devManager, productPanel, logPanel, backupPanel);
 
         cardPanel.add(productPanel, "PRODUCTS");
         cardPanel.add(reportPanel, "REPORTS");

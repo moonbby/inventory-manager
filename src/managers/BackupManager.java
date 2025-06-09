@@ -64,7 +64,7 @@ public class BackupManager {
             ps.executeBatch();
             ps.close();
 
-            logManager.log("Backed up", "inventory to " + TABLE_BACKUP + " table", true, null);
+            logManager.log("Backed up", "inventory to backup table", true, null);
         } catch (SQLException ex) {
             logManager.log("Backup", "inventory", false, ex.getMessage());
         }

@@ -10,7 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import managers.DeveloperManager;
-import managers.LogManager;
 
 /**
  *
@@ -18,16 +17,14 @@ import managers.LogManager;
  */
 public class DeveloperPanel extends JPanel {
 
-    private DeveloperManager devManager;
-    private LogManager logManager;
+    private final DeveloperManager devManager;
     private final ProductPanel productPanel;
     private final LogPanel logPanel;
     private final BackupPanel backupPanel;
 
-    public DeveloperPanel(DeveloperManager devManager, LogManager logManager,
-            ProductPanel productPanel, LogPanel logPanel, BackupPanel backupPanel) {
+    public DeveloperPanel(DeveloperManager devManager, ProductPanel productPanel, 
+            LogPanel logPanel, BackupPanel backupPanel) {
         this.devManager = devManager;
-        this.logManager = logManager;
         this.productPanel = productPanel;
         this.logPanel = logPanel;
         this.backupPanel = backupPanel;

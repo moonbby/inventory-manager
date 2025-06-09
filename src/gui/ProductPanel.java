@@ -16,7 +16,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-import managers.LogManager;
 import models.Product;
 
 /**
@@ -26,13 +25,11 @@ import models.Product;
 public class ProductPanel extends JPanel {
 
     private IInventoryManager inventoryManager;
-    private LogManager logManager;
     private JTable table;
     private DefaultTableModel tableModel;
 
-    public ProductPanel(IInventoryManager inventoryManager, LogManager logManager) {
+    public ProductPanel(IInventoryManager inventoryManager) {
         this.inventoryManager = inventoryManager;
-        this.logManager = logManager;
 
         setLayout(new BorderLayout());
         initAddProductForm();
@@ -115,6 +112,20 @@ public class ProductPanel extends JPanel {
             int quantity = Integer.parseInt(quantityStr);
             double price = Double.parseDouble(priceStr);
 
+            if (quantity < 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Quantity must be 0 or greater.",
+                        "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (price <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Price must be greater than 0.",
+                        "Invalid Price", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             Product added = inventoryManager.addProduct(
                     cmbType.getSelectedItem().toString(), name, quantity, price
             );
@@ -182,7 +193,10 @@ public class ProductPanel extends JPanel {
                 int quantity = Integer.parseInt(input);
                 int currentQuantity = inventoryManager.getProduct(productId).getQuantity();
 
-                if (quantity > currentQuantity) {
+                if (quantity <= 0) {
+                    JOptionPane.showMessageDialog(this, "Quantity must be 0 or greater.",
+                            "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
+                } else if (quantity > currentQuantity) {
                     JOptionPane.showMessageDialog(this, "The quantity must not exceed " + currentQuantity + ".",
                             "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 } else {
