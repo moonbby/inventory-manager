@@ -4,6 +4,8 @@
  */
 package managers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -61,10 +63,15 @@ public class LogManagerTest {
     public void testLog_Successful() {
         logManager.log("Tested", "logging function", true, null);
 
-        List<String> logs = logManager.getLogs();
+        List<Object[]> logs = logManager.getLogs();
         assertFalse(logs.isEmpty());
 
-        boolean found = logs.stream().anyMatch(log -> log.contains("Successfully tested logging function"));
+        List<String> logsStr = new ArrayList<>();
+        for (Object[] o : logs) {
+            logsStr.add(Arrays.toString(o));;
+        }
+        
+        boolean found = logsStr.stream().anyMatch(log -> log.contains("Successfully tested logging function"));
         assertTrue("Expected log message not found in logs", found);
     }
 
@@ -72,11 +79,16 @@ public class LogManagerTest {
     public void testLog_Unsuccessful() {
         logManager.log("Remove", "test product", false, "Product not found");
 
-        List<String> logs = logManager.getLogs();
+        List<Object[]> logs = logManager.getLogs();
         assertFalse(logs.isEmpty());
 
-        boolean found_1 = logs.stream().anyMatch(log -> log.contains("Failed to remove test product"));
-        boolean found_2 = logs.stream().anyMatch(log -> log.contains("Product not found"));
+        List<String> logsStr = new ArrayList<>();
+        for (Object[] o : logs) {
+            logsStr.add(Arrays.toString(o));
+        }
+
+        boolean found_1 = logsStr.stream().anyMatch(log -> log.contains("Failed to remove test product"));
+        boolean found_2 = logsStr.stream().anyMatch(log -> log.contains("Product not found"));
 
         assertTrue("Expected log message not found in logs", found_1);
         assertTrue("Expected error details not found in logs", found_2);
@@ -89,10 +101,15 @@ public class LogManagerTest {
     public void testLogRaw() {
         logManager.logRaw("This is a test");
 
-        List<String> logs = logManager.getLogs();
+        List<Object[]> logs = logManager.getLogs();
         assertFalse(logs.isEmpty());
 
-        boolean found = logs.stream().anyMatch(log -> log.contains("This is a test"));
+        List<String> logsStr = new ArrayList<>();
+        for (Object[] o : logs) {
+            logsStr.add(Arrays.toString(o));
+        }
+        
+        boolean found = logsStr.stream().anyMatch(log -> log.contains("This is a test"));
         assertTrue("Expected log message not found in logs", found);
     }
 
@@ -104,10 +121,15 @@ public class LogManagerTest {
         String testMessage = "This is a test.";
         logManager.logRaw(testMessage);
 
-        List<String> logs = logManager.getLogs();
+        List<Object[]> logs = logManager.getLogs();
         assertFalse(logs.isEmpty());
 
-        boolean found = logs.stream().anyMatch(log -> log.contains(testMessage));
+        List<String> logsStr = new ArrayList<>();
+        for (Object[] o : logs) {
+            logsStr.add(Arrays.toString(o));
+        }
+        
+        boolean found = logsStr.stream().anyMatch(log -> log.contains(testMessage));
         assertTrue("Expected log message not found in logs", found);
     }
 
@@ -120,10 +142,15 @@ public class LogManagerTest {
         logManager.logRaw("Dummy log 2");
 
         logManager.resetLogs();
-        List<String> logsAfterReset = logManager.getLogs();
+        List<Object[]> logsAfterReset = logManager.getLogs();
 
-        boolean dummy1Exists = logsAfterReset.stream().anyMatch(log -> log.contains("Dummy log 1"));
-        boolean dummy2Exists = logsAfterReset.stream().anyMatch(log -> log.contains("Dummy log 2"));
+        List<String> logsStr = new ArrayList<>();
+        for (Object[] o : logsAfterReset) {
+            logsStr.add(Arrays.toString(o));
+        }
+
+        boolean dummy1Exists = logsStr.stream().anyMatch(log -> log.contains("Dummy log 1"));
+        boolean dummy2Exists = logsStr.stream().anyMatch(log -> log.contains("Dummy log 2"));
 
         assertFalse("Dummy log 1 should be cleared", dummy1Exists);
         assertFalse("Dummy log 2 should be cleared", dummy2Exists);

@@ -24,7 +24,7 @@ import models.Product;
  */
 public class ProductPanel extends JPanel {
 
-    private IInventoryManager inventoryManager;
+    private final IInventoryManager inventoryManager;
     private JTable table;
     private DefaultTableModel tableModel;
 

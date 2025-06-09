@@ -7,7 +7,6 @@ package managers;
 import interfaces.IInventoryManager;
 import java.util.List;
 import models.Product;
-import models.ToyProduct;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

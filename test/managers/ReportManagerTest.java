@@ -6,6 +6,8 @@ package managers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.List;
+import models.Product;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -52,7 +54,7 @@ public class ReportManagerTest {
         seeder.resetProductsTable();
         seeder.resetLogsTable();
         seeder.resetBackupTable();
-        
+
         this.inventoryManager = new InventoryManager();
         this.logManager = new LogManager();
         this.reportManager = new ReportManager(inventoryManager, logManager);
@@ -70,16 +72,23 @@ public class ReportManagerTest {
      */
     @Test
     public void testShowSummaryReport() {
-        inventoryManager.addProduct("Toy", "Doll", 3, 10.0);
-        inventoryManager.addProduct("Clothing", "Hat", 2, 5.0);
+        List<String[]> summaryBefore = reportManager.getSummaryCounts();
+        int toyCountBefore = getCountForType(summaryBefore, "Toy");
+        int clothingCountBefore = getCountForType(summaryBefore, "Clothing");
+        int totalBefore = getCountForType(summaryBefore, "Total");
 
-        reportManager.showSummaryReport();
-        String output = outContent.toString();
+        // Add new items
+        inventoryManager.addProduct("Toy", "Test Doll", 3, 10.0);
+        inventoryManager.addProduct("Clothing", "Test Hat", 2, 5.0);
 
-        assertTrue(output.contains("=== Inventory Summary Report ==="));
-        assertTrue(output.contains("Toy products:"));
-        assertTrue(output.contains("Clothing products:"));
-        assertTrue(output.contains("Total products:"));
+        List<String[]> summaryAfter = reportManager.getSummaryCounts();
+        int toyCountAfter = getCountForType(summaryAfter, "Toy");
+        int clothingCountAfter = getCountForType(summaryAfter, "Clothing");
+        int totalAfter = getCountForType(summaryAfter, "Total");
+
+        assertTrue("Toy count did not increase", toyCountAfter > toyCountBefore);
+        assertTrue("Clothing count did not increase", clothingCountAfter > clothingCountBefore);
+        assertTrue("Total count did not increase by 2", totalAfter == totalBefore + 2);
     }
 
     /**
@@ -87,14 +96,20 @@ public class ReportManagerTest {
      */
     @Test
     public void testShowMostExpensiveProduct() {
-        inventoryManager.addProduct("Toy", "Doll", 5, 3.99);
-        inventoryManager.addProduct("Clothing", "Coat", 2, 9999.99);
+        inventoryManager.addProduct("Toy", "Test Doll", 5, 3.99);
+        inventoryManager.addProduct("Clothing", "Test Coat", 2, 9999.99);
 
-        reportManager.showMostExpensiveProduct();
-        String output = outContent.toString();
+        Product expensive = reportManager.getMostExpensiveProduct();
 
-        assertTrue(output.contains("=== Most Expensive Product ==="));
-        assertTrue(output.contains("Coat")); // most expensive
-        assertTrue(output.contains("Price: $9999.99"));
+        assertEquals("Test Coat", expensive.getName());
+        assertEquals(9999.99, expensive.getPrice(), 0.01);
+    }
+
+    private int getCountForType(List<String[]> summary, String type) {
+        return summary.stream()
+                .filter(row -> row[0].equalsIgnoreCase(type))
+                .findFirst()
+                .map(row -> Integer.parseInt(row[1]))
+                .orElse(0);
     }
 }
