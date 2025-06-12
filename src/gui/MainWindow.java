@@ -29,6 +29,7 @@ public class MainWindow extends JFrame {
     private final BackupManager backupManager = new BackupManager(logManager);
     private final ReportManager reportManager = new ReportManager(inventoryManager, logManager);
     private final DeveloperManager devManager = new DeveloperManager();
+    private HomePanel homePanel;
     private ProductPanel productPanel;
     private ReportPanel reportPanel;
     private BackupPanel backupPanel;
@@ -45,11 +46,15 @@ public class MainWindow extends JFrame {
 
     private void initUI() {
         JPanel navPanel = new JPanel();
+        
+        JButton btnHome = new JButton("Home");
         JButton btnProducts = new JButton("Products");
         JButton btnReports = new JButton("Reports");
         JButton btnBackup = new JButton("Backup");
         JButton btnLog = new JButton("Logs");
         JButton btnDeveloper = new JButton("Developer");
+        
+        navPanel.add(btnHome);
         navPanel.add(btnProducts);
         navPanel.add(btnReports);
         navPanel.add(btnBackup);
@@ -59,12 +64,14 @@ public class MainWindow extends JFrame {
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
+        homePanel = new HomePanel();
         productPanel = new ProductPanel(inventoryManager);
         reportPanel = new ReportPanel(reportManager);
         backupPanel = new BackupPanel(backupManager);
         logPanel = new LogPanel(logManager);
         developerPanel = new DeveloperPanel(devManager, productPanel, logPanel, backupPanel);
 
+        cardPanel.add(homePanel, "HOME");
         cardPanel.add(productPanel, "PRODUCTS");
         cardPanel.add(reportPanel, "REPORTS");
         cardPanel.add(backupPanel, "BACKUP");
@@ -75,6 +82,7 @@ public class MainWindow extends JFrame {
         add(navPanel, BorderLayout.NORTH);
         add(cardPanel, BorderLayout.CENTER);
 
+        btnHome.addActionListener(e -> cardLayout.show(cardPanel, "HOME"));
         btnProducts.addActionListener(e -> cardLayout.show(cardPanel, "PRODUCTS"));
         btnReports.addActionListener(e -> cardLayout.show(cardPanel, "REPORTS"));
         btnBackup.addActionListener(e -> cardLayout.show(cardPanel, "BACKUP"));

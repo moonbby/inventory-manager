@@ -7,8 +7,10 @@ package gui;
 import interfaces.IInventoryManager;
 import java.awt.BorderLayout;
 import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -38,24 +40,42 @@ public class ProductPanel extends JPanel {
     }
 
     public void initAddProductForm() {
+        JLabel lblType = new JLabel("Type:");
         JComboBox<String> cmbType = new JComboBox();
         cmbType.addItem("Clothing");
         cmbType.addItem("Toy");
 
-        JTextField txtName = new JTextField("Name", 20);
-        JTextField txtQuantity = new JTextField("Quantity", 5);
-        JTextField txtPrice = new JTextField("Price", 4);
+        JLabel lblName = new JLabel("Name:");
+        JTextField txtName = new JTextField(20);
+
+        JLabel lblQuantity = new JLabel("Quantity:");
+        JTextField txtQuantity = new JTextField(5);
+
+        JLabel lblPrice = new JLabel("Price:");
+        JTextField txtPrice = new JTextField(4);
+
         JButton btnAdd = new JButton("Add");
 
         btnAdd.addActionListener(e
                 -> handleAddProduct(cmbType, txtName, txtQuantity, txtPrice));
 
         JPanel topPanel = new JPanel();
+        topPanel.setBorder(BorderFactory.createTitledBorder("ADD PRODUCT"));
+
+        topPanel.add(lblType);
         topPanel.add(cmbType);
+
+        topPanel.add(lblName);
         topPanel.add(txtName);
+
+        topPanel.add(lblQuantity);
         topPanel.add(txtQuantity);
+
+        topPanel.add(lblPrice);
         topPanel.add(txtPrice);
+
         topPanel.add(btnAdd);
+        
         add(topPanel, BorderLayout.NORTH);
     }
 
@@ -102,7 +122,7 @@ public class ProductPanel extends JPanel {
             String quantityStr = txtQuantity.getText();
             String priceStr = txtPrice.getText();
 
-            if (name.equals("Name") || name.trim().isEmpty()) {
+            if (name.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(this,
                         "Please enter a valid product name.",
                         "Invalid Name", JOptionPane.ERROR_MESSAGE);
@@ -139,9 +159,9 @@ public class ProductPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Product added successfully!",
                         "Success", JOptionPane.INFORMATION_MESSAGE);
                 cmbType.setSelectedIndex(0);
-                txtName.setText("Name");
-                txtQuantity.setText("Quantity");
-                txtPrice.setText("Price");
+                txtName.setText("");
+                txtQuantity.setText("");
+                txtPrice.setText("");
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Please enter valid numbers.",
