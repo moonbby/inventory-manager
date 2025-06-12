@@ -6,7 +6,6 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -16,6 +15,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import managers.BackupManager;
 import models.Product;
+import static utils.ThemeManager.*;
+
 
 /**
  *
@@ -31,17 +32,22 @@ public class BackupPanel extends JPanel {
         this.backupManager = backupManager;
 
         setLayout(new BorderLayout());
+        stylePanel(this);
+        
         initBackupActions();
         initBackupTable();
     }
 
     public void initBackupActions() {
         JButton btnBackup = new JButton("Backup");
+        styleButton(btnBackup);
 
         btnBackup.addActionListener(e -> handleBackup());
 
         JPanel topPanel = new JPanel();
-        topPanel.setBorder(BorderFactory.createTitledBorder("BACKUP ACTIONS"));
+        stylePanel(topPanel);
+        topPanel.setBorder(createSectionBorder("BACKUP ACTIONS"));
+        
         topPanel.add(btnBackup);
         add(topPanel, BorderLayout.NORTH);
     }
@@ -60,6 +66,7 @@ public class BackupPanel extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         JPanel centPanel = new JPanel();
+        stylePanel(centPanel);
         centPanel.add(new JScrollPane(table));
         add(centPanel, BorderLayout.CENTER);
 
