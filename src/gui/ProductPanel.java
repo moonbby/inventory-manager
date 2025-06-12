@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import models.Product;
+import static utils.ThemeManager.*;
 
 /**
  *
@@ -34,6 +35,8 @@ public class ProductPanel extends JPanel {
         this.inventoryManager = inventoryManager;
 
         setLayout(new BorderLayout());
+        stylePanel(this);
+        
         initAddProductForm();
         initProductTable();
         initProductActions();
@@ -41,26 +44,32 @@ public class ProductPanel extends JPanel {
 
     public void initAddProductForm() {
         JLabel lblType = new JLabel("Type:");
+        styleSubLabel(lblType);
         JComboBox<String> cmbType = new JComboBox();
         cmbType.addItem("Clothing");
         cmbType.addItem("Toy");
 
         JLabel lblName = new JLabel("Name:");
+        styleSubLabel(lblName);
         JTextField txtName = new JTextField(20);
 
         JLabel lblQuantity = new JLabel("Quantity:");
+        styleSubLabel(lblQuantity);
         JTextField txtQuantity = new JTextField(5);
 
         JLabel lblPrice = new JLabel("Price:");
+        styleSubLabel(lblPrice);
         JTextField txtPrice = new JTextField(4);
 
         JButton btnAdd = new JButton("Add");
+        styleButton(btnAdd);
 
         btnAdd.addActionListener(e
                 -> handleAddProduct(cmbType, txtName, txtQuantity, txtPrice));
 
         JPanel topPanel = new JPanel();
-        topPanel.setBorder(BorderFactory.createTitledBorder("ADD PRODUCT"));
+        stylePanel(topPanel);
+        topPanel.setBorder(createSectionBorder("ADD PRODUCT"));
 
         topPanel.add(lblType);
         topPanel.add(cmbType);
@@ -93,6 +102,7 @@ public class ProductPanel extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         JPanel centPanel = new JPanel();
+        stylePanel(centPanel);
         centPanel.add(new JScrollPane(table));
         add(centPanel, BorderLayout.CENTER);
 
@@ -103,12 +113,19 @@ public class ProductPanel extends JPanel {
         JButton btnRemove = new JButton("Remove");
         JButton btnRestock = new JButton("Restock");
         JButton btnPurchase = new JButton("Purchase");
+        
+        styleButton(btnRemove);
+        styleButton(btnRestock);
+        styleButton(btnPurchase);
 
         btnRemove.addActionListener(e -> handleRemoveProduct());
         btnRestock.addActionListener(e -> handleRestockProduct());
         btnPurchase.addActionListener(e -> handlePurchaseProduct());
 
         JPanel botPanel = new JPanel();
+        stylePanel(botPanel);
+        botPanel.setBorder(createSectionBorder("ACTIONS"));
+        
         botPanel.add(btnRemove);
         botPanel.add(btnRestock);
         botPanel.add(btnPurchase);

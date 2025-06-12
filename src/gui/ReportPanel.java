@@ -16,6 +16,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import managers.ReportManager;
 import models.Product;
+import static utils.ThemeManager.*;
 
 /**
  *
@@ -31,6 +32,8 @@ public class ReportPanel extends JPanel {
         this.reportManager = reportManager;
 
         setLayout(new BorderLayout());
+        stylePanel(this);
+        
         initReportActions();
         initProductTable();
     }
@@ -39,20 +42,23 @@ public class ReportPanel extends JPanel {
         JButton btnSummary = new JButton("Summary Report");
         JButton btnMostExpensive = new JButton("Most Expensive Product");
         JButton btnLowStock = new JButton("Low Stock Product");
+        
+        styleButton(btnSummary);
+        styleButton(btnMostExpensive);
+        styleButton(btnLowStock);
 
         btnSummary.addActionListener(e -> handleSummary());
         btnMostExpensive.addActionListener(e -> handleMostExpensive());
         btnLowStock.addActionListener(e -> handleLowStock());
 
         JPanel topPanel = new JPanel();
+        stylePanel(topPanel);
+        topPanel.setBorder(createSectionBorder("REPORTS"));
+        
         topPanel.add(btnSummary);
         topPanel.add(btnMostExpensive);
         topPanel.add(btnLowStock);
 
-        topPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("REPORTS"),
-                BorderFactory.createEmptyBorder(10, 20, 10, 20)
-        ));
         add(topPanel, BorderLayout.NORTH);
     }
 
@@ -70,7 +76,9 @@ public class ReportPanel extends JPanel {
         scrollPane.setVisible(false);
 
         JPanel centPanel = new JPanel();
+        stylePanel(centPanel);
         centPanel.add(scrollPane);
+        
         add(centPanel, BorderLayout.CENTER);
     }
 

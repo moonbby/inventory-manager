@@ -5,6 +5,8 @@
 package gui;
 
 import javax.swing.SwingUtilities;
+import utils.ThemeInitialiser;
+import static utils.ThemeInitialiser.*;
 
 /**
  *
@@ -14,6 +16,7 @@ public class InventorySystem {
     
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+            ThemeInitialiser.applyGlobalOptionPaneTheme();
             new MainWindow().setVisible(true);
         });
     }

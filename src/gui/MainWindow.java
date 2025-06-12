@@ -15,6 +15,7 @@ import managers.DeveloperManager;
 import managers.InventoryManager;
 import managers.LogManager;
 import managers.ReportManager;
+import static utils.ThemeManager.*;
 
 /**
  *
@@ -24,11 +25,13 @@ public class MainWindow extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel cardPanel;
+    
     private final IInventoryManager inventoryManager = new InventoryManager();
     private final LogManager logManager = new LogManager();
     private final BackupManager backupManager = new BackupManager(logManager);
     private final ReportManager reportManager = new ReportManager(inventoryManager, logManager);
     private final DeveloperManager devManager = new DeveloperManager();
+    
     private HomePanel homePanel;
     private ProductPanel productPanel;
     private ReportPanel reportPanel;
@@ -46,6 +49,7 @@ public class MainWindow extends JFrame {
 
     private void initUI() {
         JPanel navPanel = new JPanel();
+        stylePanel(navPanel);
         
         JButton btnHome = new JButton("Home");
         JButton btnProducts = new JButton("Products");
@@ -53,6 +57,13 @@ public class MainWindow extends JFrame {
         JButton btnBackup = new JButton("Backup");
         JButton btnLog = new JButton("Logs");
         JButton btnDeveloper = new JButton("Developer");
+        
+        styleButton(btnHome);
+        styleButton(btnProducts);
+        styleButton(btnReports);
+        styleButton(btnBackup);
+        styleButton(btnLog);
+        styleButton(btnDeveloper);
         
         navPanel.add(btnHome);
         navPanel.add(btnProducts);

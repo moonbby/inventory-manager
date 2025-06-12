@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import managers.LogManager;
+import static utils.ThemeManager.*;
 
 /**
  *
@@ -29,17 +30,21 @@ public class LogPanel extends JPanel {
         this.logManager = logManager;
 
         setLayout(new BorderLayout());
+        stylePanel(this);
+        
         initLogActions();
         initLogTable();
     }
 
     public void initLogActions() {
         JButton btnRefresh = new JButton("Refresh");
+        styleButton(btnRefresh);
 
         btnRefresh.addActionListener(e -> handleRefreshLogs());
 
         JPanel topPanel = new JPanel();
-        topPanel.setBorder(BorderFactory.createTitledBorder("LOGS"));
+        stylePanel(topPanel);
+        topPanel.setBorder(createSectionBorder("LOGS"));
         topPanel.add(btnRefresh);
         add(topPanel, BorderLayout.NORTH);
     }
@@ -63,6 +68,7 @@ public class LogPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         JPanel centerWrapper = new JPanel();
+        stylePanel(centerWrapper);
         centerWrapper.add(scrollPane);
         add(centerWrapper, BorderLayout.CENTER);
 
