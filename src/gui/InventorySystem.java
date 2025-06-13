@@ -6,7 +6,6 @@ package gui;
 
 import javax.swing.SwingUtilities;
 import utils.ThemeInitialiser;
-import static utils.ThemeInitialiser.*;
 
 /**
  *

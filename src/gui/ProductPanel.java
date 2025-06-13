@@ -7,11 +7,9 @@ package gui;
 import interfaces.IInventoryManager;
 import java.awt.BorderLayout;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,6 +18,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import models.Product;
 import static utils.ThemeManager.*;
+import static utils.InputValidator.*;
+import static utils.DialogUtils.*;
+import static utils.TableUtils.populateProductTable;
 
 /**
  *
@@ -36,16 +37,16 @@ public class ProductPanel extends JPanel {
 
         setLayout(new BorderLayout());
         stylePanel(this);
-        
-        initAddProductForm();
+
+        initProductForm();
         initProductTable();
         initProductActions();
     }
 
-    public void initAddProductForm() {
+    public void initProductForm() {
         JLabel lblType = new JLabel("Type:");
         styleSubLabel(lblType);
-        JComboBox<String> cmbType = new JComboBox();
+        JComboBox<String> cmbType = new JComboBox<>();
         cmbType.addItem("Clothing");
         cmbType.addItem("Toy");
 
@@ -84,7 +85,7 @@ public class ProductPanel extends JPanel {
         topPanel.add(txtPrice);
 
         topPanel.add(btnAdd);
-        
+
         add(topPanel, BorderLayout.NORTH);
     }
 
@@ -113,7 +114,7 @@ public class ProductPanel extends JPanel {
         JButton btnRemove = new JButton("Remove");
         JButton btnRestock = new JButton("Restock");
         JButton btnPurchase = new JButton("Purchase");
-        
+
         styleButton(btnRemove);
         styleButton(btnRestock);
         styleButton(btnPurchase);
@@ -125,7 +126,7 @@ public class ProductPanel extends JPanel {
         JPanel botPanel = new JPanel();
         stylePanel(botPanel);
         botPanel.setBorder(createSectionBorder("ACTIONS"));
-        
+
         botPanel.add(btnRemove);
         botPanel.add(btnRestock);
         botPanel.add(btnPurchase);
@@ -139,127 +140,116 @@ public class ProductPanel extends JPanel {
             String quantityStr = txtQuantity.getText();
             String priceStr = txtPrice.getText();
 
-            if (name.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                        "Please enter a valid product name.",
-                        "Invalid Name", JOptionPane.ERROR_MESSAGE);
+            if (!isValidProductName(name)) {
+                showError(this, "Please enter a valid product name.");
+                return;
+            }
+
+            if (!isValidProductQuantity(quantityStr)) {
+                showError(this, "Quantity must be 0 or greater.");
+                return;
+            }
+
+            if (!isValidProductPrice(priceStr)) {
+                showError(this, "Price must be greater than 0.");
                 return;
             }
 
             int quantity = Integer.parseInt(quantityStr);
             double price = Double.parseDouble(priceStr);
 
-            if (quantity < 0) {
-                JOptionPane.showMessageDialog(this,
-                        "Quantity must be 0 or greater.",
-                        "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (price <= 0) {
-                JOptionPane.showMessageDialog(this,
-                        "Price must be greater than 0.",
-                        "Invalid Price", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             Product added = inventoryManager.addProduct(
                     cmbType.getSelectedItem().toString(), name, quantity, price
             );
 
             if (added == null) {
-                JOptionPane.showMessageDialog(this,
-                        "Failed to add product. Please check that all fields are valid.",
-                        "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                showError(this, "Failed to add product. Please check that all fields are valid.");
             } else {
                 refreshProductTable();
-                JOptionPane.showMessageDialog(this, "Product added successfully!",
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
+                showSuccess(this, "Product added successfully!");
                 cmbType.setSelectedIndex(0);
                 txtName.setText("");
                 txtQuantity.setText("");
                 txtPrice.setText("");
             }
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Please enter valid numbers.",
-                    "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            showError(this, "Please enter a valid number.");;
         }
     }
 
     private void handleRemoveProduct() {
         int selectedRow = table.getSelectedRow();
-        if (selectedRow != -1) {
-            String productId = table.getValueAt(selectedRow, 0).toString();
-            inventoryManager.removeProduct(productId);
-            refreshProductTable();
-            JOptionPane.showMessageDialog(this, "Product removed successfully!",
-                    "Success", JOptionPane.INFORMATION_MESSAGE);
+        if (selectedRow == -1) {
+            return;
         }
+
+        String productId = table.getValueAt(selectedRow, 0).toString();
+        inventoryManager.removeProduct(productId);
+        refreshProductTable();
+        showSuccess(this, "Product removed successfully!");
     }
 
     private void handleRestockProduct() {
         try {
             int selectedRow = table.getSelectedRow();
-            if (selectedRow != -1) {
-                String productId = table.getValueAt(selectedRow, 0).toString();
-                String input = JOptionPane.showInputDialog(this, "Enter quantity to restock:");
-                int quantity = Integer.parseInt(input);
-
-                if (quantity <= 0) {
-                    JOptionPane.showMessageDialog(this, "The quantity must be more than 0.",
-                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    inventoryManager.addQuantity(productId, quantity);
-                    refreshProductTable();
-                    JOptionPane.showMessageDialog(this, "Product restocked successfully!",
-                            "Success", JOptionPane.INFORMATION_MESSAGE);
-                }
+            if (selectedRow == -1) {
+                return;
             }
+
+            String productId = table.getValueAt(selectedRow, 0).toString();
+            String input = promptInput(this, "Enter quantity to restock:");
+            if (input == null || input.trim().isEmpty()) {
+                return;
+            }
+            if (!isValidRestockAmount(input)) {
+                showError(this, "The quantity must be more than 0.");
+                return;
+            }
+
+            int quantity = Integer.parseInt(input);
+            inventoryManager.addQuantity(productId, quantity);
+            refreshProductTable();
+            showSuccess(this, "Product restocked successfully!");
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid number.",
-                    "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            showError(this, "Please enter a valid number.");
         }
     }
 
     private void handlePurchaseProduct() {
         try {
             int selectedRow = table.getSelectedRow();
-            if (selectedRow != -1) {
-                String productId = table.getValueAt(selectedRow, 0).toString();
-                String input = JOptionPane.showInputDialog(this, "Enter quantity to purchase:");
-                int quantity = Integer.parseInt(input);
-                int currentQuantity = inventoryManager.getProduct(productId).getQuantity();
-
-                if (quantity <= 0) {
-                    JOptionPane.showMessageDialog(this, "Quantity must be 0 or greater.",
-                            "Invalid Quantity", JOptionPane.ERROR_MESSAGE);
-                } else if (quantity > currentQuantity) {
-                    JOptionPane.showMessageDialog(this, "The quantity must not exceed " + currentQuantity + ".",
-                            "Invalid Input", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    inventoryManager.reduceQuantity(productId, quantity);
-                    refreshProductTable();
-                    JOptionPane.showMessageDialog(this, "Product purchased successfully!",
-                            "Success", JOptionPane.INFORMATION_MESSAGE);
-                }
+            if (selectedRow == -1) {
+                return;
             }
+
+            String productId = table.getValueAt(selectedRow, 0).toString();
+            String input = promptInput(this, "Enter quantity to purchase:");
+            if (input == null || input.trim().isEmpty()) {
+                return;
+            }
+
+            int currentQuantity = inventoryManager.getProduct(productId).getQuantity();
+            if (!isValidPurchaseAmount(input, currentQuantity)) {
+                showError(this, "Please enter a valid quantity (1 – " + currentQuantity + ").");
+                return;
+            }
+
+            int quantity = Integer.parseInt(input);
+            inventoryManager.reduceQuantity(productId, quantity);
+            refreshProductTable();
+            showSuccess(this, "Product purchased successfully!");
+
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid number.",
-                    "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            showError(this, "Please enter a valid number.");
         }
     }
 
     public void refreshProductTable() {
         List<Product> products = inventoryManager.getAllProducts();
-        tableModel.setRowCount(0);
-        for (Product p : products) {
-            tableModel.addRow(new Object[]{
-                p.getID(),
-                p.getProductType(),
-                p.getName(),
-                p.getQuantity(),
-                p.getPrice()
-            });
+        if (products == null) {
+            return;
         }
+        
+        populateProductTable(tableModel, products);
     }
 }

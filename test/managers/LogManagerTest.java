@@ -155,5 +155,4 @@ public class LogManagerTest {
         assertFalse("Dummy log 1 should be cleared", dummy1Exists);
         assertFalse("Dummy log 2 should be cleared", dummy2Exists);
     }
-
 }
