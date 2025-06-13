@@ -5,7 +5,6 @@
 package gui;
 
 import java.awt.BorderLayout;
-import static utils.ThemeColours.*;
 import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

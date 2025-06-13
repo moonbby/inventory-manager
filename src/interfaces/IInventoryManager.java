@@ -4,8 +4,6 @@
  */
 package interfaces;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import models.Product;
 

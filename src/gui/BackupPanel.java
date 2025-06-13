@@ -7,7 +7,6 @@ package gui;
 import java.awt.BorderLayout;
 import java.util.List;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -16,7 +15,8 @@ import javax.swing.table.DefaultTableModel;
 import managers.BackupManager;
 import models.Product;
 import static utils.ThemeManager.*;
-
+import static utils.DialogUtils.*;
+import static utils.TableUtils.populateProductTable;
 
 /**
  *
@@ -76,21 +76,11 @@ public class BackupPanel extends JPanel {
     private void handleBackup() {
         backupManager.backupInventory();
         refreshBackupTable();
-        JOptionPane.showMessageDialog(this, "Inventory backed up successfully!",
-                "Success", JOptionPane.INFORMATION_MESSAGE);
+        showSuccess(this, "Inventory backed up successfully!");
     }
 
     public void refreshBackupTable() {
         List<Product> products = backupManager.getBackup();
-        tableModel.setRowCount(0);
-        for (Product p : products) {
-            tableModel.addRow(new Object[]{
-                p.getID(),
-                p.getProductType(),
-                p.getName(),
-                p.getQuantity(),
-                p.getPrice()
-            });
-        }
+        populateProductTable(tableModel, products);
     }
 }

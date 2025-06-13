@@ -7,9 +7,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -17,6 +15,9 @@ import javax.swing.table.DefaultTableModel;
 import managers.ReportManager;
 import models.Product;
 import static utils.ThemeManager.*;
+import static utils.InputValidator.*;
+import static utils.DialogUtils.*;
+import static utils.TableUtils.populateProductTable;
 
 /**
  *
@@ -33,7 +34,7 @@ public class ReportPanel extends JPanel {
 
         setLayout(new BorderLayout());
         stylePanel(this);
-        
+
         initReportActions();
         initProductTable();
     }
@@ -42,7 +43,7 @@ public class ReportPanel extends JPanel {
         JButton btnSummary = new JButton("Summary Report");
         JButton btnMostExpensive = new JButton("Most Expensive Product");
         JButton btnLowStock = new JButton("Low Stock Product");
-        
+
         styleButton(btnSummary);
         styleButton(btnMostExpensive);
         styleButton(btnLowStock);
@@ -54,7 +55,7 @@ public class ReportPanel extends JPanel {
         JPanel topPanel = new JPanel();
         stylePanel(topPanel);
         topPanel.setBorder(createSectionBorder("REPORTS"));
-        
+
         topPanel.add(btnSummary);
         topPanel.add(btnMostExpensive);
         topPanel.add(btnLowStock);
@@ -64,7 +65,7 @@ public class ReportPanel extends JPanel {
 
     public void initProductTable() {
         table = new JTable();
-        
+
         table.setRowSelectionAllowed(false);
         table.setColumnSelectionAllowed(false);
         table.setCellSelectionEnabled(false);
@@ -78,7 +79,7 @@ public class ReportPanel extends JPanel {
         JPanel centPanel = new JPanel();
         stylePanel(centPanel);
         centPanel.add(scrollPane);
-        
+
         add(centPanel, BorderLayout.CENTER);
     }
 
@@ -90,7 +91,11 @@ public class ReportPanel extends JPanel {
                 return false;
             }
         };
+        
         List<String[]> summary = reportManager.getSummaryCounts();
+        if (summary == null) {
+            return;
+        }
 
         for (String[] row : summary) {
             summaryModel.addRow(row);
@@ -115,30 +120,32 @@ public class ReportPanel extends JPanel {
             revalidate();
             repaint();
         } else {
-            JOptionPane.showMessageDialog(this, "No products found.", "Empty", JOptionPane.INFORMATION_MESSAGE);
+            showInfo(this, "No products found.");
         }
     }
 
     private void handleLowStock() {
         try {
-            String input = JOptionPane.showInputDialog(this, "Enter stock threshold:");
-            int threshold = Integer.parseInt(input);
-
-            if (threshold <= 0) {
-                JOptionPane.showMessageDialog(this, "The threshold must be over 0.",
-                        "Invalid Input", JOptionPane.ERROR_MESSAGE);
-            } else {
-                List<Product> products = reportManager.exportLowStockMenu(threshold);
-                refreshReportTable(products);
-
-                table.setVisible(true);
-                scrollPane.setVisible(true);
-                revalidate();
-                repaint();
+            String input = promptInput(this, "Enter stock threshold:");
+            if (input == null || input.trim().isEmpty()) {
+                return;
             }
+
+            if (!isValidLowStockThreshold(input)) {
+                showError(this, "The threshold must be over 0.");
+                return;
+            }
+
+            int threshold = Integer.parseInt(input);
+            List<Product> products = reportManager.exportLowStockMenu(threshold);
+            refreshReportTable(products);
+
+            table.setVisible(true);
+            scrollPane.setVisible(true);
+            revalidate();
+            repaint();
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Please enter a valid number.",
-                    "Invalid Input", JOptionPane.ERROR_MESSAGE);
+            showError(this, "Please enter a valid number.");
         }
     }
 
@@ -150,17 +157,8 @@ public class ReportPanel extends JPanel {
                 return false;
             }
         };
-        
-        for (Product p : products) {
-            productModel.addRow(new Object[]{
-                p.getID(),
-                p.getProductType(),
-                p.getName(),
-                p.getQuantity(),
-                p.getPrice()
-            });
-        }
-        
-        table.setModel(productModel); 
+
+        populateProductTable(productModel, products);
+        table.setModel(productModel);
     }
 }

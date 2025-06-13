@@ -5,12 +5,11 @@
 package gui;
 
 import java.awt.BorderLayout;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import managers.DeveloperManager;
 import static utils.ThemeManager.*;
+import static utils.DialogUtils.*;
 
 /**
  *
@@ -63,21 +62,18 @@ public class DeveloperPanel extends JPanel {
     private void handleResetProducts() {
         devManager.resetProductTable();
         productPanel.refreshProductTable();
-        JOptionPane.showMessageDialog(this, "Products reset successfully!",
-                "Success", JOptionPane.INFORMATION_MESSAGE);
+        showSuccess(this, "Products reset successfully!");
     }
 
     private void handleResetLogs() {
         devManager.resetLogTable();
         logPanel.refreshLogTable();
-        JOptionPane.showMessageDialog(this, "Logs reset successfully!",
-                "Success", JOptionPane.INFORMATION_MESSAGE);
+        showSuccess(this, "Logs reset successfully!");
     }
 
     private void handleResetBackup() {
         devManager.resetBackupTable();
         backupPanel.refreshBackupTable();
-        JOptionPane.showMessageDialog(this, "Backup reset successfully!",
-                "Success", JOptionPane.INFORMATION_MESSAGE);
+        showSuccess(this, "Backup reset successfully!");
     }
 }
