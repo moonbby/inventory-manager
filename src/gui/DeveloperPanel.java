@@ -52,24 +52,24 @@ public class DeveloperPanel extends JPanel {
      */
     public void initDevActions() {
         JButton btnResetProducts = new JButton("Reset Products");
-        JButton btnResetLogs = new JButton("Reset Logs");
         JButton btnResetBackup = new JButton("Reset Backup");
-
+        JButton btnResetLogs = new JButton("Reset Logs");
+        
         styleButton(btnResetProducts);
-        styleButton(btnResetLogs);
         styleButton(btnResetBackup);
-
+        styleButton(btnResetLogs);
+        
         btnResetProducts.addActionListener(e -> handleResetProducts());
-        btnResetLogs.addActionListener(e -> handleResetLogs());
         btnResetBackup.addActionListener(e -> handleResetBackup());
-
+        btnResetLogs.addActionListener(e -> handleResetLogs());
+        
         JPanel btnPanel = new JPanel();
         stylePanel(btnPanel);
         btnPanel.setBorder(createSectionBorder("DEVELOPER TOOLS"));
 
         btnPanel.add(btnResetProducts);
-        btnPanel.add(btnResetLogs);
         btnPanel.add(btnResetBackup);
+        btnPanel.add(btnResetLogs);
 
         add(btnPanel, BorderLayout.CENTER);
     }
@@ -82,6 +82,15 @@ public class DeveloperPanel extends JPanel {
         productPanel.refreshProductTable();
         showSuccess(this, "Products reset successfully!");
     }
+    
+    /**
+     * Resets the backup table and refreshes the UI.
+     */
+    private void handleResetBackup() {
+        devManager.resetBackupTable();
+        backupPanel.refreshBackupTable();
+        showSuccess(this, "Backup reset successfully!");
+    }
 
     /**
      * Resets the log table and refreshes the UI.
@@ -90,14 +99,5 @@ public class DeveloperPanel extends JPanel {
         devManager.resetLogTable();
         logPanel.refreshLogTable();
         showSuccess(this, "Logs reset successfully!");
-    }
-
-    /**
-     * Resets the backup table and refreshes the UI.
-     */
-    private void handleResetBackup() {
-        devManager.resetBackupTable();
-        backupPanel.refreshBackupTable();
-        showSuccess(this, "Backup reset successfully!");
     }
 }
