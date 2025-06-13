@@ -20,14 +20,25 @@ import utils.ProductFactory;
 import utils.ProductTypes;
 
 /**
+ * Handles direct database operations for product records. Logs the result of
+ * the operation.
  *
- * @author lifeo
+ * Implements both read and write interfaces to support full CRUD functionality.
  */
 public class ProductDAO implements IProductReader, IProductWriter {
 
     private final Connection conn = DatabaseManager.getInstance().getConnection();
     private final LogManager logManager = new LogManager();
 
+    /**
+     * Adds a new product to the database with a generated ID.
+     *
+     * @param type the product type (Clothing or Toy)
+     * @param name the product name
+     * @param quantity the initial quantity
+     * @param price the price
+     * @return the created Product; null if the insert failed
+     */
     @Override
     public Product addProduct(String type, String name, int quantity, double price) {
         Product product = null;
@@ -39,7 +50,7 @@ public class ProductDAO implements IProductReader, IProductWriter {
             } else if (type.equalsIgnoreCase(ProductTypes.TOY)) {
                 product = new ToyProduct(id, name, quantity, price);
             } else {
-                // This case should never occur due to controller-level validation
+                // Fallback safety: product type should be validated upstream, but enforce here to guarantee correctness
                 throw new IllegalArgumentException("Invalid product type");
             }
 
@@ -61,6 +72,13 @@ public class ProductDAO implements IProductReader, IProductWriter {
         return product;
     }
 
+    /**
+     * Removes a product from the database by ID. Logs success or failure,
+     * including reason if not found.
+     *
+     * @param id the product ID
+     * @return true if the product was removed; false otherwise
+     */
     @Override
     public boolean removeProduct(String id) {
         try {
@@ -84,6 +102,14 @@ public class ProductDAO implements IProductReader, IProductWriter {
         }
     }
 
+    /**
+     * Updates a product's quantity in the database. Fetches the current value,
+     * applies changes, and logs how the quantity changed.
+     *
+     * @param id the product ID
+     * @param newQuantity the new quantity value
+     * @return true if update succeeded; false otherwise
+     */
     @Override
     public boolean updateQuantity(String id, int newQuantity) {
         try {
@@ -128,6 +154,13 @@ public class ProductDAO implements IProductReader, IProductWriter {
         }
     }
 
+    /**
+     * Retrieves a product by ID from the database. Logs whether the product was
+     * found and returned.
+     *
+     * @param id the product ID
+     * @return the Product object; null if not found
+     */
     @Override
     public Product getProduct(String id) {
         Product product = null;
@@ -155,6 +188,11 @@ public class ProductDAO implements IProductReader, IProductWriter {
         return product;
     }
 
+    /**
+     * Returns all products currently stored in the database.
+     *
+     * @return a list of all products
+     */
     @Override
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
@@ -177,6 +215,12 @@ public class ProductDAO implements IProductReader, IProductWriter {
         return products;
     }
 
+    /**
+     * Retrieves all products below the given stock threshold.
+     *
+     * @param threshold the stock limit
+     * @return list of products under the threshold
+     */
     @Override
     public List<Product> getLowStockProducts(int threshold) {
         List<Product> products = new ArrayList<>();
@@ -200,6 +244,12 @@ public class ProductDAO implements IProductReader, IProductWriter {
         return products;
     }
 
+    /**
+     * Generates the next available product ID using sequential format. Based on
+     * max ID currently in the database.
+     *
+     * @return the next product ID string, or fallback if failed
+     */
     private String generateNextId() {
         try {
             String sql = "SELECT MAX(" + COL_PRODUCT_ID + ") AS MAX_ID FROM " + TABLE_PRODUCTS;

@@ -15,8 +15,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Unit tests for the BackupManager class.
  *
- * @author lifeo
+ * Validates backup creation and retrieval logic using seeded database states.
  */
 public class BackupManagerTest {
 
@@ -28,6 +29,9 @@ public class BackupManagerTest {
     public BackupManagerTest() {
     }
 
+    /**
+     * Establishes database connection and initialises tables once before all tests.
+     */
     @BeforeClass
     public static void setUpClass() {
         System.setProperty("derby.system.home", "database");
@@ -40,11 +44,17 @@ public class BackupManagerTest {
         seeder.initialiseAllTables();
     }
 
+    /**
+     * Closes database connection after all tests complete.
+     */
     @AfterClass
     public static void tearDownClass() {
         seeder.closeConnection();
     }
 
+    /**
+     * Resets all tables before each test to maintain isolation and consistency.
+     */
     @Before
     public void setUp() {
         seeder.resetProductsTable();
@@ -61,7 +71,7 @@ public class BackupManagerTest {
     }
 
     /**
-     * Test of backupInventory method, of class BackupManager.
+     * Verifies that calling backupInventory() correctly backs up inventory data.
      */
     @Test
     public void testBackupInventory() {
@@ -77,7 +87,7 @@ public class BackupManagerTest {
     }
 
     /**
-     * Test of getBackup method, of class BackupManager.
+     * Ensures getBackup() retrieves the backed-up data after a backup is created.
      */
     @Test
     public void testGetBackup() {
@@ -88,6 +98,9 @@ public class BackupManagerTest {
         assertFalse("Expected non-empty backup", backedUpProducts.isEmpty());
     }
 
+    /**
+     * Ensures getBackup() returns an empty list when no backup has been created.
+     */
     @Test
     public void testGetBackupWhenEmpty() {
         List<Product> backedUpProducts = backupManager.getBackup();

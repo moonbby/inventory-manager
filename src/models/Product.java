@@ -5,10 +5,10 @@
 package models;
 
 /**
- * Abstract superclass representing a generic product in the inventory.
+ * Abstract superclass representing a product entity in the inventory.
  *
- * Encapsulates shared attributes such as ID, name, quantity, and price.
- * Subclasses must specify the product type by implementing getProductType().
+ * Defines shared attributes (ID, name, quantity, price) and enforces
+ * type-specific behaviour through getProductType().
  */
 public abstract class Product {
 
@@ -17,7 +17,14 @@ public abstract class Product {
     private int quantity;
     private double price;
 
-    // Constructs a product with a predefined ID, typically used during file loading.
+    /**
+     * Constructs a Product with the specified ID and attributes.
+     *
+     * @param id the unique product ID
+     * @param name the product name
+     * @param quantity the available stock count
+     * @param price the unit price
+     */
     public Product(String id, String name, int quantity, double price) {
         this.id = id;
         setName(name);
@@ -26,7 +33,8 @@ public abstract class Product {
     }
 
     /**
-     * Returns the product type. Must be implemented by subclasses.
+     * Returns the product type string (e.g., "Clothing", "Toy"). Must be
+     * implemented by concrete subclasses.
      *
      * @return the product type (e.g., "Clothing", "Toy")
      */
@@ -60,10 +68,13 @@ public abstract class Product {
         this.price = price;
     }
 
-    // Returns a string representation of the product.
+    /**
+     * Returns a string representation of the product.
+     *
+     * @return product details as a string
+     */
     @Override
     public String toString() {
         return getProductType() + "," + id + "," + name + "," + quantity + "," + price;
     }
-
 }

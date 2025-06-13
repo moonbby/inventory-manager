@@ -12,14 +12,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- *
- * @author lifeo
+ * Handles creation, seeding, and resetting of the database tables required by
+ * the application (Products table, Backup table, Logs table).
  */
 public class InventoryTableSeeder {
 
     private final Connection conn = DatabaseManager.getInstance().getConnection();
     private final LogManager logManager = new LogManager();
 
+    /**
+     * Initialises all required database tables and populates initial product
+     * data.
+     */
     public void initialiseAllTables() {
         try {
             conn.setAutoCommit(false);
@@ -45,6 +49,10 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Creates the main products table if it does not exist. On success, seeds
+     * the table with default product entries.
+     */
     public void createAndSeedProductsTable() {
         if (!tableExists(TABLE_PRODUCTS)) {
             Statement statement = null;
@@ -73,6 +81,9 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Inserts predefined products into the products table.
+     */
     public void seedProductsTable() {
         Statement statement = null;
         try {
@@ -101,6 +112,9 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Creates the backup table if it does not exist.
+     */
     public void createBackupProductsTable() {
         if (!tableExists(TABLE_BACKUP)) {
             Statement statement = null;
@@ -128,6 +142,9 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Creates the logs table if it does not exist.
+     */
     public void createLogsTable() {
         if (!tableExists(TABLE_LOGS)) {
             Statement statement = null;
@@ -153,6 +170,10 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Clears all entries from the products table and repopulates it with
+     * default data.
+     */
     public void resetProductsTable() {
         Statement statement = null;
         try {
@@ -172,6 +193,10 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Clears all entries from the logs table and resets its primary key
+     * sequence.
+     */
     public void resetLogsTable() {
         Statement statement = null;
         try {
@@ -191,6 +216,9 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Clears all entries from the backup table.
+     */
     public void resetBackupTable() {
         Statement statement = null;
         try {
@@ -209,10 +237,19 @@ public class InventoryTableSeeder {
         }
     }
 
+    /**
+     * Closes the database connection managed by DatabaseManager.
+     */
     public void closeConnection() {
         DatabaseManager.getInstance().closeConnections();
     }
 
+    /**
+     * Checks whether a given table exists in the connected database.
+     *
+     * @param tableName the name of the table to check
+     * @return true if the table exists; false otherwise
+     */
     private boolean tableExists(String tableName) {
         try {
             DatabaseMetaData dbMeta = this.conn.getMetaData();

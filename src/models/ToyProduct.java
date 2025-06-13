@@ -9,18 +9,27 @@ import static utils.ProductTypes.TOY;
 /**
  * Represents a toy product within the inventory.
  *
- * Extends the abstract Product class and defines "Toy" as its type. Supports
- * both manual ID assignment (for file loading) and auto-generated IDs (for new
- * entries).
+ * A concrete subclass of Product with "Toy" as its predefined type.
  */
 public class ToyProduct extends Product {
 
-    // Constructs a ToyProduct with a predefined ID, typically used during file loading.
+    /**
+     * Constructs a ToyProduct with the specified attributes.
+     *
+     * @param id       the unique product ID
+     * @param name     the product name
+     * @param quantity the available quantity
+     * @param price    the unit price
+     */
     public ToyProduct(String id, String name, int quantity, double price) {
         super(id, name, quantity, price);
     }
 
-    // Returns the type of this product.
+    /**
+     * Returns the product type associated with this item.
+     *
+     * @return the string "Toy"
+     */
     @Override
     public String getProductType() {
         return TOY;
