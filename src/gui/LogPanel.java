@@ -77,7 +77,7 @@ public class LogPanel extends JPanel {
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         table.getColumnModel().getColumn(0).setPreferredWidth(35);
-        table.getColumnModel().getColumn(1).setPreferredWidth(302);
+        table.getColumnModel().getColumn(1).setPreferredWidth(304);
         table.getColumnModel().getColumn(2).setPreferredWidth(111);
 
         JScrollPane scrollPane = new JScrollPane(table);
