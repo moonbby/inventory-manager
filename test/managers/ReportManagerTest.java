@@ -16,8 +16,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Unit tests for ReportManager class.
  *
- * @author lifeo
+ * Validates summary reporting, most expensive product retrieval, and low stock
+ * filtering logic.
  */
 public class ReportManagerTest {
 
@@ -32,6 +34,10 @@ public class ReportManagerTest {
     public ReportManagerTest() {
     }
 
+    /**
+     * Establishes database connection and initialises tables once before all
+     * tests.
+     */
     @BeforeClass
     public static void setUpClass() {
         System.setProperty("derby.system.home", "database");
@@ -44,11 +50,17 @@ public class ReportManagerTest {
         seeder.initialiseAllTables();
     }
 
+    /**
+     * Closes database connection after all tests complete.
+     */
     @AfterClass
     public static void tearDownClass() {
         seeder.closeConnection();
     }
 
+    /**
+     * Resets all tables before each test to maintain isolation and consistency.
+     */
     @Before
     public void setUp() {
         seeder.resetProductsTable();
@@ -68,7 +80,9 @@ public class ReportManagerTest {
     }
 
     /**
-     * Test of showSummaryReport method, of class ReportManager.
+     * Tests that the summary report reflects added products accurately.
+     * Validates category-wise and total product counts before and after
+     * insertion.
      */
     @Test
     public void testShowSummaryReport() {
@@ -77,7 +91,6 @@ public class ReportManagerTest {
         int clothingCountBefore = getCountForType(summaryBefore, "Clothing");
         int totalBefore = getCountForType(summaryBefore, "Total");
 
-        // Add new items
         inventoryManager.addProduct("Toy", "Test Doll", 3, 10.0);
         inventoryManager.addProduct("Clothing", "Test Hat", 2, 5.0);
 
@@ -92,7 +105,7 @@ public class ReportManagerTest {
     }
 
     /**
-     * Test of showMostExpensiveProduct method, of class ReportManager.
+     * Tests that the most expensive product is correctly identified.
      */
     @Test
     public void testShowMostExpensiveProduct() {
@@ -105,6 +118,36 @@ public class ReportManagerTest {
         assertEquals(9999.99, expensive.getPrice(), 0.01);
     }
 
+    /**
+     * Tests that exportLowStockMenu correctly filters and returns products
+     * below a specified stock threshold.
+     */
+    @Test
+    public void testExportLowStockMenu() {
+        inventoryManager.addProduct("Toy", "Plush Bear", 2, 12.0);
+        inventoryManager.addProduct("Clothing", "Winter Jacket", 15, 79.99);
+
+        List<Product> lowStock = reportManager.exportLowStockMenu(5);
+
+        assertNotNull(lowStock);
+        assertFalse(lowStock.isEmpty());
+
+        for (Product p : lowStock) {
+            assertTrue(p.getQuantity() < 5);
+        }
+
+        boolean containsHighStock = lowStock.stream()
+                .anyMatch(p -> p.getName().equals("Winter Jacket"));
+        assertFalse("High-stock product should not appear in low stock list", containsHighStock);
+    }
+
+    /**
+     * Helper method to extract category or total count from summary report.
+     *
+     * @param summary list of string arrays containing category and count
+     * @param type category type ("Toy", "Clothing", or "Total")
+     * @return integer count associated with the given type
+     */
     private int getCountForType(List<String[]> summary, String type) {
         return summary.stream()
                 .filter(row -> row[0].equalsIgnoreCase(type))

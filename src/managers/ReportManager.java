@@ -14,12 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import models.Product;
 import utils.ProductFactory;
+import static utils.ProductTypes.*;
 
 /**
  * Generates analytical reports based on current inventory data.
  *
- * Provides category-based summaries and identifies the most expensive product.
- * Outputs are printed to the console and logged for traceability.
+ * Provides category-based summaries, identifies the most expensive product, and
+ * lists low stock items
  */
 public class ReportManager {
 
@@ -28,13 +29,16 @@ public class ReportManager {
     private final IInventoryManager inventoryManager;
 
     public ReportManager(IInventoryManager inventoryManager,
-             LogManager logManager) {
+            LogManager logManager) {
         this.inventoryManager = inventoryManager;
         this.logManager = logManager;
     }
 
     /**
-     * Prints a summary of product counts by category.
+     * Retrieves a breakdown of product counts grouped by category. Adds a final
+     * row with the total count.
+     *
+     * @return list of rows where each row contains [type, count]
      */
     public List<String[]> getSummaryCounts() {
         List<String[]> rows = new ArrayList<>();
@@ -46,8 +50,18 @@ public class ReportManager {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String type = rs.getString(COL_TYPE);
+                String typeRaw = rs.getString(COL_TYPE);
                 int count = rs.getInt("count");
+
+                String type;
+                if (typeRaw.equalsIgnoreCase(CLOTHING)) {
+                    type = CLOTHING;
+                } else if (typeRaw.equalsIgnoreCase(TOY)) {
+                    type = TOY;
+                } else {
+                    type = "Other";
+                }
+
                 rows.add(new String[]{type, String.valueOf(count)});
                 total += count;
             }
@@ -55,7 +69,6 @@ public class ReportManager {
             rs.close();
             ps.close();
 
-            // Add total row at the bottom
             rows.add(new String[]{"Total", String.valueOf(total)});
 
             logManager.log("Viewed", "summary report", true, null);
@@ -67,9 +80,9 @@ public class ReportManager {
     }
 
     /**
-     * Displays the most expensive product in the inventory.
+     * Retrieves the most expensive product from the database..
      *
-     * Prints product details or a warning if the inventory is empty.
+     * @return the highest-priced product; null if empty
      */
     public Product getMostExpensiveProduct() {
         try {
@@ -93,10 +106,10 @@ public class ReportManager {
     }
 
     /**
-     * Prompts for a stock threshold and exports low-stock products to file.
+     * Retrieves all products with quantity below the given threshold.
      *
-     * Filters inventory below the threshold and delegates writing to
-     * FileManager.
+     * @param threshold the exclusive upper limit for stock level
+     * @return list of low-stock products
      */
     public List<Product> exportLowStockMenu(int threshold) {
         List<Product> lowStockProducts = inventoryManager.getLowStockProducts(threshold);

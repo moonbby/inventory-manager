@@ -5,8 +5,10 @@
 package utils;
 
 /**
+ * Defines constant values for database table and column names.
  *
- * @author lifeo
+ * Centralises schema definitions to reduce duplication and avoid typos.
+ * Used throughout the application for database operations.
  */
 public class DBConstants {
 

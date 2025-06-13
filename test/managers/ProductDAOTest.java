@@ -14,8 +14,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Unit tests for ProductDAO class.
  *
- * @author lifeo
+ * Validates CRUD operations and filtering of products using DAO pattern.
  */
 public class ProductDAOTest {
 
@@ -25,6 +26,9 @@ public class ProductDAOTest {
     public ProductDAOTest() {
     }
 
+    /**
+     * Establishes database connection and initialises tables once before all tests.
+     */
     @BeforeClass
     public static void setUpClass() {
         System.setProperty("derby.system.home", "database");
@@ -37,11 +41,17 @@ public class ProductDAOTest {
         seeder.initialiseAllTables();
     }
 
+    /**
+     * Closes database connection after all tests complete.
+     */
     @AfterClass
     public static void tearDownClass() {
         seeder.closeConnection();
     }
 
+    /**
+     * Resets all tables before each test to maintain isolation and consistency.
+     */
     @Before
     public void setUp() {
         seeder.resetProductsTable();
@@ -56,7 +66,7 @@ public class ProductDAOTest {
     }
 
     /**
-     * Test of addProduct method, of class ProductDAO.
+     * Tests that a product can be added and retrieved successfully.
      */
     @Test
     public void testAddAndGetProduct() {
@@ -66,13 +76,16 @@ public class ProductDAOTest {
         assertEquals("DAO Jeans", fetched.getName());
     }
 
+    /**
+     * Expects an exception when trying to add a product with an invalid type.
+     */
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidProductType() {
         productDAO.addProduct("InvalidType", "Invalid", 1, 1.0);
     }
 
     /**
-     * Test of removeProduct method, of class ProductDAO.
+     * Tests that a product can be removed and is no longer retrievable afterwards.
      */
     @Test
     public void testRemoveProduct() {
@@ -83,7 +96,7 @@ public class ProductDAOTest {
     }
 
     /**
-     * Test of updateQuantity method, of class ProductDAO.
+     * Tests that a product's quantity can be updated correctly.
      */
     @Test
     public void testUpdateQuantity() {
@@ -94,7 +107,7 @@ public class ProductDAOTest {
     }
 
     /**
-     * Test of getProduct method, of class ProductDAO.
+     * Tests that a valid product ID returns the correct product.
      */
     @Test
     public void testGetProduct_ValidId() {
@@ -106,6 +119,9 @@ public class ProductDAOTest {
         assertEquals("Test Jacket", fetched.getName());
     }
 
+    /**
+     * Tests that an invalid product ID returns null.
+     */
     @Test
     public void testGetProduct_InvalidId() {
         Product fetched = productDAO.getProduct("NON_EXISTENT_ID");
@@ -113,7 +129,7 @@ public class ProductDAOTest {
     }
 
     /**
-     * Test of getAllProducts method, of class ProductDAO.
+     * Tests that getAllProducts returns an accurate list and grows after additions.
      */
     @Test
     public void testGetAllProducts() {
@@ -129,7 +145,7 @@ public class ProductDAOTest {
     }
 
     /**
-     * Test of getLowStockProducts method, of class ProductDAO.
+     * Tests that products below a given stock threshold are correctly identified.
      */
     @Test
     public void testGetLowStockProducts() {
@@ -137,5 +153,4 @@ public class ProductDAOTest {
         List<Product> low = productDAO.getLowStockProducts(5);
         assertFalse(low.isEmpty());
     }
-
 }

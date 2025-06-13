@@ -10,17 +10,27 @@ import models.Product;
 import utils.ProductTypes;
 
 /**
- * Concrete implementation of IInventoryManager for in-memory inventory control.
+ * Database-backed implementation of IInventoryManager for inventory operations.
  *
- * Supports standard CRUD operations and inventory access. Acts as the primary
- * interface between the stored product data and system operations.
+ * Provides core logic for managing inventory records, including validation and
+ * CRUD operations. Delegates database persistence to the underlying ProductDAO.
  */
 public class InventoryManager implements IInventoryManager {
 
-    // Stores all products in memory, keyed by unique product ID.
+    /**
+     * Handles low-level database operations for product records.
+     */
     private final ProductDAO productDAO = new ProductDAO();
 
-    // Adds a product to the inventory by its unique ID.
+    /**
+     * Adds a new product to the inventory if the provided values are valid.
+     *
+     * @param type the product type (must be Clothing or Toy)
+     * @param name the product name (non-null, non-empty)
+     * @param quantity the starting quantity (must be 0 or greater)
+     * @param price the product price (must be greater than 0)
+     * @return the newly added Product if successful; null otherwise
+     */
     @Override
     public Product addProduct(String type, String name, int quantity, double price) {
         if (type == null || (!type.equalsIgnoreCase(ProductTypes.CLOTHING) && !type.equalsIgnoreCase(ProductTypes.TOY))) {
@@ -32,17 +42,30 @@ public class InventoryManager implements IInventoryManager {
         if (quantity < 0 || price <= 0) {
             return null;
         }
-        
+
         return productDAO.addProduct(type, name, quantity, price);
     }
 
-    // Removes a product from the inventory by its ID.
+    /**
+     * Removes a product from the inventory by its unique ID.
+     *
+     * @param id the product ID
+     * @return true if removed successfully; false otherwise
+     */
     @Override
     public boolean removeProduct(String id) {
         return productDAO.removeProduct(id);
     }
 
-    // Reduces the quantity of the specified product, preventing negative stock.
+    /**
+     * Decreases the quantity of the given product. Will not reduce stock below
+     * zero.
+     *
+     * @param id the product ID
+     * @param quantity the amount to deduct
+     * @return true if updated successfully; false if product not found or
+     * quantity invalid
+     */
     @Override
     public boolean reduceQuantity(String id, int quantity) {
         if (quantity < 0) {
@@ -58,10 +81,16 @@ public class InventoryManager implements IInventoryManager {
         return false;
     }
 
-    // Increases the quantity of the specified product.
+    /**
+     * Increases the quantity of the given product.
+     *
+     * @param id the product ID
+     * @param quantity the amount to add (must be positive)
+     * @return true if updated successfully; false otherwise
+     */
     @Override
     public boolean addQuantity(String id, int quantity) {
-        if (quantity < 0) {
+        if (quantity <= 0) {
             return false;
         }
 
@@ -73,24 +102,44 @@ public class InventoryManager implements IInventoryManager {
         return false;
     }
 
-    // Retrieves a product by its ID.
+    /**
+     * Retrieves a product by its ID from the database.
+     *
+     * @param id the product ID
+     * @return the matching Product if found; null otherwise
+     */
     @Override
     public Product getProduct(String id) {
         return productDAO.getProduct(id);
     }
 
-    // Returns a collection of all products in the inventory.
+    /**
+     * Retrieves all products currently stored in the database.
+     *
+     * @return a list of all products
+     */
     @Override
     public List<Product> getAllProducts() {
         return productDAO.getAllProducts();
     }
 
-    // Checks whether a product with the given ID exists in the inventory.
+    /**
+     * Checks whether a product with the given ID exists in the inventory.
+     *
+     * @param id the product ID
+     * @return true if the product exists; false otherwise
+     */
     @Override
     public boolean hasProduct(String id) {
         return productDAO.getProduct(id) != null;
     }
 
+    /**
+     * Retrieves all products with stock below the given threshold.
+     *
+     * @param threshold the stock level to compare against
+     * @return a list of low-stock products
+     */
     @Override
     public List<Product> getLowStockProducts(int threshold) {
         return productDAO.getLowStockProducts(threshold);

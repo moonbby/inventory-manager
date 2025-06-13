@@ -5,17 +5,25 @@
 package gui;
 
 import javax.swing.SwingUtilities;
-import utils.ThemeInitialiser;
+import static utils.ThemeManager.applyGlobalOptionPaneTheme;
 
 /**
+ * Entry point for launching the Inventory Management System GUI.
  *
- * @author lifeo
+ * Applies global theme styling and opens the main application window.
  */
 public class InventorySystem {
-    
+
+    /**
+     * Main method that starts the Swing application on the Event Dispatch
+     * Thread. Ensures GUI components are created and updated in a thread-safe
+     * manner.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            ThemeInitialiser.applyGlobalOptionPaneTheme();
+            applyGlobalOptionPaneTheme();
             new MainWindow().setVisible(true);
         });
     }

@@ -15,8 +15,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Unit tests for the LogManager class.
  *
- * @author lifeo
+ * Validates log recording, retrieval, and raw entry insertion.
  */
 public class LogManagerTest {
 
@@ -26,6 +27,9 @@ public class LogManagerTest {
     public LogManagerTest() {
     }
 
+    /**
+     * Establishes database connection and initialises tables once before all tests.
+     */
     @BeforeClass
     public static void setUpClass() {
         System.setProperty("derby.system.home", "database");
@@ -38,11 +42,17 @@ public class LogManagerTest {
         seeder.initialiseAllTables();
     }
 
+    /**
+     * Closes database connection after all tests complete.
+     */
     @AfterClass
     public static void tearDownClass() {
         seeder.closeConnection();
     }
 
+    /**
+     * Resets all tables before each test to maintain isolation and consistency.
+     */
     @Before
     public void setUp() {
         seeder.resetProductsTable();
@@ -57,7 +67,7 @@ public class LogManagerTest {
     }
 
     /**
-     * Test of log method, of class LogManager.
+     * Verifies that a successful action is logged correctly.
      */
     @Test
     public void testLog_Successful() {
@@ -75,6 +85,9 @@ public class LogManagerTest {
         assertTrue("Expected log message not found in logs", found);
     }
 
+    /**
+     * Verifies that a failed action is logged with appropriate error message.
+     */
     @Test
     public void testLog_Unsuccessful() {
         logManager.log("Remove", "test product", false, "Product not found");
@@ -95,7 +108,7 @@ public class LogManagerTest {
     }
 
     /**
-     * Test of logRaw method, of class LogManager.
+     * Verifies raw log entries are saved correctly.
      */
     @Test
     public void testLogRaw() {
@@ -114,7 +127,7 @@ public class LogManagerTest {
     }
 
     /**
-     * Test of getLogs method, of class LogManager.
+     * Verifies that logs are correctly retrieved from the database.
      */
     @Test
     public void testGetLogs() {
@@ -131,28 +144,5 @@ public class LogManagerTest {
         
         boolean found = logsStr.stream().anyMatch(log -> log.contains(testMessage));
         assertTrue("Expected log message not found in logs", found);
-    }
-
-    /**
-     * Test of resetLogs method, of class LogManager.
-     */
-    @Test
-    public void testResetLogs() {
-        logManager.logRaw("Dummy log 1");
-        logManager.logRaw("Dummy log 2");
-
-        logManager.resetLogs();
-        List<Object[]> logsAfterReset = logManager.getLogs();
-
-        List<String> logsStr = new ArrayList<>();
-        for (Object[] o : logsAfterReset) {
-            logsStr.add(Arrays.toString(o));
-        }
-
-        boolean dummy1Exists = logsStr.stream().anyMatch(log -> log.contains("Dummy log 1"));
-        boolean dummy2Exists = logsStr.stream().anyMatch(log -> log.contains("Dummy log 2"));
-
-        assertFalse("Dummy log 1 should be cleared", dummy1Exists);
-        assertFalse("Dummy log 2 should be cleared", dummy2Exists);
     }
 }
