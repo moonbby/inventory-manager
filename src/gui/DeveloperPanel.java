@@ -12,8 +12,11 @@ import static utils.ThemeManager.*;
 import static utils.DialogUtils.*;
 
 /**
+ * A GUI panel for accessing developer tools to reset application data.
  *
- * @author lifeo
+ * Offers buttons to reset product data, log history, and backup records.
+ *
+ * This panel interacts with DeveloperManager for reset logic.
  */
 public class DeveloperPanel extends JPanel {
 
@@ -22,6 +25,14 @@ public class DeveloperPanel extends JPanel {
     private final LogPanel logPanel;
     private final BackupPanel backupPanel;
 
+    /**
+     * Constructs the developer panel and initialises its layout and actions.
+     *
+     * @param devManager handles data reset operations
+     * @param productPanel the product panel to be refreshed after reset
+     * @param logPanel the log panel to be refreshed after reset
+     * @param backupPanel the backup panel to be refreshed after reset
+     */
     public DeveloperPanel(DeveloperManager devManager, ProductPanel productPanel,
             LogPanel logPanel, BackupPanel backupPanel) {
         this.devManager = devManager;
@@ -35,6 +46,10 @@ public class DeveloperPanel extends JPanel {
         initDevActions();
     }
 
+    /**
+     * Initialises developer buttons for resetting Products, Logs, and Backup
+     * tables. Adds the buttons to a styled container panel.
+     */
     public void initDevActions() {
         JButton btnResetProducts = new JButton("Reset Products");
         JButton btnResetLogs = new JButton("Reset Logs");
@@ -51,7 +66,7 @@ public class DeveloperPanel extends JPanel {
         JPanel btnPanel = new JPanel();
         stylePanel(btnPanel);
         btnPanel.setBorder(createSectionBorder("DEVELOPER TOOLS"));
-        
+
         btnPanel.add(btnResetProducts);
         btnPanel.add(btnResetLogs);
         btnPanel.add(btnResetBackup);
@@ -59,18 +74,27 @@ public class DeveloperPanel extends JPanel {
         add(btnPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Resets the product table and refreshes the UI.
+     */
     private void handleResetProducts() {
         devManager.resetProductTable();
         productPanel.refreshProductTable();
         showSuccess(this, "Products reset successfully!");
     }
 
+    /**
+     * Resets the log table and refreshes the UI.
+     */
     private void handleResetLogs() {
         devManager.resetLogTable();
         logPanel.refreshLogTable();
         showSuccess(this, "Logs reset successfully!");
     }
 
+    /**
+     * Resets the backup table and refreshes the UI.
+     */
     private void handleResetBackup() {
         devManager.resetBackupTable();
         backupPanel.refreshBackupTable();

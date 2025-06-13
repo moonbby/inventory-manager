@@ -9,8 +9,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
+ * Manages the database connection for the inventory system.
  *
- * @author lifeo
+ * Establishes a connection to an embedded Derby database and provides shared
+ * access across the application. Handles retry logic and graceful shutdown.
  */
 public class DatabaseManager {
 
@@ -19,18 +21,35 @@ public class DatabaseManager {
     private static final DatabaseManager instance = new DatabaseManager();
     private Connection conn;
 
+    /**
+     * Sets the database storage directory to "database" folder.
+     */
     static {
         System.setProperty("derby.system.home", "database");
     }
 
+    /**
+     * Private constructor to enforce singleton pattern.
+     */
     private DatabaseManager() {
         establishConnection();
     }
 
+    /**
+     * Returns the singleton instance of the DatabaseManager.
+     *
+     * @return the shared DatabaseManager instance
+     */
     public static DatabaseManager getInstance() {
         return instance;
     }
 
+    /**
+     * Provides access to the current database connection. If the connection is
+     * null or closed, it attempts to re-establish it.
+     *
+     * @return the active database connection
+     */
     public Connection getConnection() {
         try {
             if (conn == null || conn.isClosed()) {
@@ -42,6 +61,12 @@ public class DatabaseManager {
         return conn;
     }
 
+    /**
+     * Attempts to establish a new database connection with retry logic.
+     *
+     * @return true if the connection was successfully established; false
+     * otherwise
+     */
     public boolean establishConnection() {
         if (conn != null) {
             return true;
@@ -65,6 +90,9 @@ public class DatabaseManager {
         return false;
     }
 
+    /**
+     * Closes the database connection if it is open.
+     */
     public void closeConnections() {
         if (conn != null) {
             try {

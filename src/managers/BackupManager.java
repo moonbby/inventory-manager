@@ -15,26 +15,31 @@ import models.Product;
 import utils.ProductFactory;
 
 /**
- * Handles inventory backup operations to support data recovery.
+ * Manages backup operations for inventory data within the database.
  *
- * Provides functionality to duplicate the current inventory and retrieve the
- * latest backup. Ensures inventory data is preserved across sessions and
- * protected against loss or corruption.
+ * Facilitates inventory backup creation and entry retrieval. Used by the GUI to
+ * support data recovery and provide visibility into previous inventory states.
  */
 public class BackupManager {
 
     private final Connection conn = DatabaseManager.getInstance().getConnection();
     private final LogManager logManager;
-    
+
+    /**
+     * Constructs a BackupManager with the specified LogManager.
+     *
+     * @param logManager the log manager used to record backup activity
+     */
     public BackupManager(LogManager logManager) {
         this.logManager = logManager;
     }
 
     /**
-     * Creates a backup of the current inventory by copying the contents of the
-     * main inventory file to a separate backup file.
+     * Creates a database-level backup by copying all products from the main
+     * inventory table into the backup table.
      *
-     * Replaces any existing backup and logs the operation.
+     * Clears any existing backup entries before inserting the current state.
+     * Logs the operation outcome.
      */
     public void backupInventory() {
         try {
@@ -71,15 +76,14 @@ public class BackupManager {
     }
 
     /**
-     * Retrieves the contents of the latest inventory backup file.
+     * Retrieves all products currently stored in the backup table. Logs the
+     * retrieval operation and returns a list of product objects.
      *
-     * Returns each line as a string in a list. Access to the backup is logged.
-     *
-     * @return a list of backup entries
+     * @return a list of products from the backup table; empty if none found
      */
     public List<Product> getBackup() {
         List<Product> products = new ArrayList<>();
-        
+
         try {
             String sql = "SELECT * FROM " + TABLE_BACKUP;
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -89,15 +93,15 @@ public class BackupManager {
                 Product product = ProductFactory.createFromResultSet(rs);
                 products.add(product);
             }
-            
+
             ps.close();
             rs.close();
-            
+
             logManager.log("Fetched", "backup products", true, null);
         } catch (SQLException ex) {
             logManager.log("Fetch", "backup products", false, ex.getMessage());
         }
-        
+
         return products;
     }
 }

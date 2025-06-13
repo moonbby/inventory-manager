@@ -12,11 +12,17 @@ import javax.swing.SwingConstants;
 import static utils.ThemeManager.*;
 
 /**
+ * A GUI panel for displaying the home screen of the Inventory System.
  *
- * @author lifeo
+ * Shows a welcome message and a brief instruction for navigating the
+ * application.
  */
 public class HomePanel extends JPanel {
 
+    /**
+     * Constructs the HomePanel and initialises its layout and UI components.
+     * Adds a central panel with styled welcome and instruction labels.
+     */
     public HomePanel() {
         setLayout(new BorderLayout());
         stylePanel(this);
@@ -31,7 +37,7 @@ public class HomePanel extends JPanel {
         stylePanel(centPanel);
         centPanel.add(welcomeLabel);
         centPanel.add(subLabel);
-        
+
         add(centPanel, BorderLayout.CENTER);
     }
 }

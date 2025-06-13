@@ -5,8 +5,8 @@
 package utils;
 
 /**
- *
- * @author lifeo
+ * Defines constant values for valid product categories used throughout the
+ * application. Ensures consistency when comparing product types.
  */
 public class ProductTypes {
 

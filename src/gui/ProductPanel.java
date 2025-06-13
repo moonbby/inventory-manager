@@ -23,8 +23,11 @@ import static utils.DialogUtils.*;
 import static utils.TableUtils.populateProductTable;
 
 /**
+ * A GUI panel for managing inventory products.
  *
- * @author lifeo
+ * Provides functionality to add, remove, restock, and purchase products.
+ * Displays product data in a table and includes controls for basic inventory
+ * operations.
  */
 public class ProductPanel extends JPanel {
 
@@ -32,6 +35,11 @@ public class ProductPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
 
+    /**
+     * Constructs the product panel and initialises its layout and actions.
+     *
+     * @param inventoryManager the inventory manager used to perform operations
+     */
     public ProductPanel(IInventoryManager inventoryManager) {
         this.inventoryManager = inventoryManager;
 
@@ -43,6 +51,10 @@ public class ProductPanel extends JPanel {
         initProductActions();
     }
 
+    /**
+     * Initialises the form for adding new products. Includes fields for product
+     * type, name, quantity, and price, and a button to submit.
+     */
     public void initProductForm() {
         JLabel lblType = new JLabel("Type:");
         styleSubLabel(lblType);
@@ -64,7 +76,6 @@ public class ProductPanel extends JPanel {
 
         JButton btnAdd = new JButton("Add");
         styleButton(btnAdd);
-
         btnAdd.addActionListener(e
                 -> handleAddProduct(cmbType, txtName, txtQuantity, txtPrice));
 
@@ -74,21 +85,21 @@ public class ProductPanel extends JPanel {
 
         topPanel.add(lblType);
         topPanel.add(cmbType);
-
         topPanel.add(lblName);
         topPanel.add(txtName);
-
         topPanel.add(lblQuantity);
         topPanel.add(txtQuantity);
-
         topPanel.add(lblPrice);
         topPanel.add(txtPrice);
-
         topPanel.add(btnAdd);
 
         add(topPanel, BorderLayout.NORTH);
     }
 
+    /**
+     * Initialises the product table used to display all inventory items.
+     * Configures the table model, selection mode, and layout.
+     */
     public void initProductTable() {
         String[] columns = {"ID", "Type", "Name", "Quantity", "Price"};
         tableModel = new DefaultTableModel(columns, 0) {
@@ -110,6 +121,10 @@ public class ProductPanel extends JPanel {
         refreshProductTable();
     }
 
+    /**
+     * Initialises the action buttons for managing products. Includes options to
+     * remove, restock, or purchase items.
+     */
     public void initProductActions() {
         JButton btnRemove = new JButton("Remove");
         JButton btnRestock = new JButton("Restock");
@@ -133,6 +148,10 @@ public class ProductPanel extends JPanel {
         add(botPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Handles the addition of a new product based on user input. Validates
+     * input fields before attempting to add the product.
+     */
     private void handleAddProduct(JComboBox<String> cmbType, JTextField txtName,
             JTextField txtQuantity, JTextField txtPrice) {
         try {
@@ -177,6 +196,9 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles removal of the selected product from the table.
+     */
     private void handleRemoveProduct() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -189,6 +211,10 @@ public class ProductPanel extends JPanel {
         showSuccess(this, "Product removed successfully!");
     }
 
+    /**
+     * Handles restocking of the selected product. Prompts the user for quantity
+     * and validates input before applying.
+     */
     private void handleRestockProduct() {
         try {
             int selectedRow = table.getSelectedRow();
@@ -215,6 +241,10 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Handles purchasing of the selected product. Prompts for quantity and
+     * ensures it does not exceed available stock.
+     */
     private void handlePurchaseProduct() {
         try {
             int selectedRow = table.getSelectedRow();
@@ -244,12 +274,16 @@ public class ProductPanel extends JPanel {
         }
     }
 
+    /**
+     * Refreshes the product table to reflect the current state of the
+     * inventory.
+     */
     public void refreshProductTable() {
         List<Product> products = inventoryManager.getAllProducts();
         if (products == null) {
             return;
         }
-        
+
         populateProductTable(tableModel, products);
     }
 }

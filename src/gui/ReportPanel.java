@@ -20,8 +20,10 @@ import static utils.DialogUtils.*;
 import static utils.TableUtils.populateProductTable;
 
 /**
+ * A GUI panel for generating inventory reports.
  *
- * @author lifeo
+ * Supports summary reports, most expensive product lookup, and identifying low
+ * stock items. Output is shown in a central table.
  */
 public class ReportPanel extends JPanel {
 
@@ -29,6 +31,11 @@ public class ReportPanel extends JPanel {
     private JTable table;
     JScrollPane scrollPane;
 
+    /**
+     * Constructs the report panel and initialises its layout and actions.
+     *
+     * @param reportManager the report manager used to generate report data
+     */
     public ReportPanel(ReportManager reportManager) {
         this.reportManager = reportManager;
 
@@ -39,6 +46,10 @@ public class ReportPanel extends JPanel {
         initProductTable();
     }
 
+    /**
+     * Initialises the report action buttons. Adds buttons for generating
+     * summary, most expensive, and low stock reports.
+     */
     public void initReportActions() {
         JButton btnSummary = new JButton("Summary Report");
         JButton btnMostExpensive = new JButton("Most Expensive Product");
@@ -63,6 +74,10 @@ public class ReportPanel extends JPanel {
         add(topPanel, BorderLayout.NORTH);
     }
 
+    /**
+     * Sets up the table used for displaying report data. The table is hidden by
+     * default until a report is shown.
+     */
     public void initProductTable() {
         table = new JTable();
 
@@ -83,6 +98,10 @@ public class ReportPanel extends JPanel {
         add(centPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Handles generation of a summary report showing product type counts.
+     * Displays results in the table.
+     */
     private void handleSummary() {
         String[] columns = {"Type", "Count"};
         DefaultTableModel summaryModel = new DefaultTableModel(columns, 0) {
@@ -91,7 +110,7 @@ public class ReportPanel extends JPanel {
                 return false;
             }
         };
-        
+
         List<String[]> summary = reportManager.getSummaryCounts();
         if (summary == null) {
             return;
@@ -108,6 +127,10 @@ public class ReportPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Handles fetching the most expensive product and displaying it in the
+     * table.
+     */
     private void handleMostExpensive() {
         List<Product> products = new ArrayList<Product>();
         Product expensive = reportManager.getMostExpensiveProduct();
@@ -124,6 +147,10 @@ public class ReportPanel extends JPanel {
         }
     }
 
+    /**
+     * Prompts the user for a stock threshold and displays all products with
+     * stock below the entered value.
+     */
     private void handleLowStock() {
         try {
             String input = promptInput(this, "Enter stock threshold:");
@@ -149,6 +176,11 @@ public class ReportPanel extends JPanel {
         }
     }
 
+    /**
+     * Refreshes the report table using the provided list of products.
+     *
+     * @param products the products to be displayed in the table
+     */
     public void refreshReportTable(List<Product> products) {
         String[] columns = {"ID", "Type", "Name", "Quantity", "Price"};
         DefaultTableModel productModel = new DefaultTableModel(columns, 0) {
